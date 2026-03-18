@@ -23,15 +23,15 @@
   --purple:#5a4a96; --purple-lt:#ddd8f5;
   --sand:#c4963a;            /* warm sandy yellow */
   --sand-lt:#f5e8c8;
-  --header-bg:#0d3b5e;       /* deep ocean header */
+  --header-bg:#1a5fb4;       /* bright ocean blue header */
   --text:#12293d; --text2:#2e5068; --muted:#6a8ea8;
-  --shadow:0 1px 4px rgba(13,59,94,0.12),0 4px 14px rgba(13,59,94,0.09);
+  --shadow:0 1px 4px rgba(26,95,180,0.12),0 4px 14px rgba(26,95,180,0.09);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',system-ui,'Helvetica Neue',Arial,sans-serif;font-size:14px;min-height:100vh;}
 
 /* HEADER */
-header{background:var(--header-bg);border-bottom:none;padding:13px 24px;padding-right:62px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(13,59,94,0.35);position:relative;z-index:20;}
+header{background:var(--header-bg);border-bottom:none;padding:13px 24px;padding-right:110px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(26,95,180,0.35);position:relative;z-index:20;}
 .logo{width:44px;height:44px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.22);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 header h1{font-size:1.35rem;font-weight:800;line-height:1;color:#fff;}
 header h1 span{color:#7ec8e3;}
@@ -219,13 +219,13 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 
 /* WELCOME MODAL */
 .welcome-modal-bg{
-  position:fixed;inset:0;background:rgba(13,59,94,0.72);z-index:20000;
+  position:fixed;inset:0;background:rgba(26,95,180,0.72);z-index:20000;
   display:flex;align-items:center;justify-content:center;padding:20px;
   opacity:1;transition:opacity .6s ease;
 }
 .welcome-modal-bg.dissolving{opacity:0;pointer-events:none;}
 .welcome-modal-bg.closed{display:none;}
-.welcome-box{background:#eef3f9;border-radius:16px;max-width:680px;width:100%;box-shadow:0 16px 60px rgba(13,59,94,0.35);overflow:hidden;}
+.welcome-box{background:#eef3f9;border-radius:16px;max-width:680px;width:100%;box-shadow:0 16px 60px rgba(26,95,180,0.35);overflow:hidden;}
 .welcome-header{background:var(--header-bg);padding:22px 26px 18px;display:flex;align-items:center;gap:14px;}
 .welcome-logo{width:48px;height:48px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.22);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .welcome-header h2{color:#fff;font-size:1.25rem;font-weight:800;line-height:1.1;}
@@ -240,6 +240,32 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .welcome-footer{padding:0 26px 22px;display:flex;justify-content:flex-end;}
 .welcome-close-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:-apple-system,'Segoe UI',system-ui,'Helvetica Neue',Arial,sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .15s;}
 .welcome-close-btn:hover{background:var(--header-bg);}
+
+/* RELEASE NOTES BUTTON */
+.rn-btn{position:absolute;right:58px;top:50%;transform:translateY(-50%);height:28px;padding:0 11px;border-radius:14px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.85);font-size:.65rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;letter-spacing:.04em;transition:background .15s;white-space:nowrap;z-index:30;}
+.rn-btn:hover{background:rgba(255,255,255,0.22);}
+.rn-btn svg{opacity:.8;}
+
+/* RELEASE NOTES MODAL */
+.rn-modal-bg{position:fixed;inset:0;background:rgba(26,95,180,0.55);z-index:18000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.rn-modal-bg.open{opacity:1;pointer-events:all;}
+.rn-box{background:#eef3f9;border-radius:14px;max-width:540px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(26,95,180,0.28);overflow:hidden;}
+.rn-hdr{background:var(--header-bg);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.rn-hdr h3{color:#fff;font-size:.95rem;font-weight:800;margin:0;}
+.rn-hdr p{color:rgba(200,220,240,0.65);font-size:.7rem;margin-top:2px;}
+.rn-close{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.2rem;cursor:pointer;padding:0;line-height:1;}
+.rn-close:hover{color:#fff;}
+.rn-body{overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:20px;}
+.rn-version{border-bottom:1px solid var(--border);padding-bottom:16px;}
+.rn-version:last-child{border-bottom:none;padding-bottom:0;}
+.rn-vtag{display:inline-flex;align-items:center;gap:7px;margin-bottom:8px;}
+.rn-vnum{font-size:.82rem;font-weight:800;color:var(--accent);font-family:ui-monospace,'SF Mono','Consolas',monospace;}
+.rn-vdate{font-size:.7rem;color:var(--muted);}
+.rn-vbadge{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em;}
+.rn-latest{background:var(--green-lt);color:var(--green);}
+.rn-version ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.rn-version ul li{font-size:.77rem;color:var(--text2);padding-left:14px;position:relative;line-height:1.5;}
+.rn-version ul li::before{content:'·';position:absolute;left:0;color:var(--accent);font-weight:700;}
 
 /* HELP BUTTON */
 .help-btn{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;z-index:30;flex-shrink:0;}
@@ -265,9 +291,9 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .zoom-btn:hover{background:#f0f0f0;}
 
 /* ANALYSIS SUMMARY MODAL */
-.summary-bg{position:fixed;inset:0;background:rgba(13,59,94,0.55);z-index:15000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.summary-bg{position:fixed;inset:0;background:rgba(26,95,180,0.55);z-index:15000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
 .summary-bg.open{opacity:1;pointer-events:all;}
-.summary-box{background:#eef3f9;border-radius:14px;max-width:460px;width:100%;box-shadow:0 12px 48px rgba(13,59,94,0.28);overflow:hidden;transform:scale(.95);transition:transform .22s;}
+.summary-box{background:#eef3f9;border-radius:14px;max-width:460px;width:100%;box-shadow:0 12px 48px rgba(26,95,180,0.28);overflow:hidden;transform:scale(.95);transition:transform .22s;}
 .summary-bg.open .summary-box{transform:scale(1);}
 .summary-hdr{background:var(--header-bg);padding:18px 22px;display:flex;align-items:center;gap:10px;}
 .summary-hdr svg{flex-shrink:0;}
@@ -319,7 +345,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .load-overlay.show{
   pointer-events:all;
   opacity:1;
-  background:rgba(13,59,94,0.45);
+  background:rgba(26,95,180,0.45);
   backdrop-filter:blur(3px);
   -webkit-backdrop-filter:blur(3px);
 }
@@ -351,8 +377,89 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 #toast.show{opacity:1;transform:translateY(0);}
 #toast.tg{background:#065f46;}#toast.to{background:#92400e;}#toast.tr{background:#991b1b;}
 
-@media(max-width:1100px){.shell{flex-direction:column;}.sidebar{width:100%;height:auto;max-height:200px;}.mapp{width:100%!important;height:280px;border-top:1px solid var(--border);}.resizer{display:none;}}
-@media(max-width:700px){.shell{flex-direction:column;height:auto;overflow:auto;}.mapp{width:100%!important;height:250px;}header{padding:10px 14px;}header h1{font-size:1.15rem;}}
+@media(max-width:1100px){
+  .shell{flex-direction:column;}
+  .sidebar{width:100%;height:auto;max-height:220px;flex-direction:row;flex-wrap:wrap;gap:8px;padding:10px 12px;}
+  .mapp{width:100%!important;height:260px;border-top:1px solid var(--border);}
+  .resizer{display:none;}
+}
+
+@media(max-width:700px){
+  /* HEADER */
+  header{padding:10px 14px;padding-right:54px;}
+  header h1{font-size:1.05rem;}
+  header p{display:none;}
+  .help-btn{width:28px;height:28px;font-size:.82rem;right:12px;}
+
+  /* SHELL */
+  .shell{flex-direction:column;height:auto;overflow:auto;min-height:100vh;}
+
+  /* SIDEBAR — compact strip on mobile */
+  .sidebar{
+    width:100%!important;height:auto;max-height:none;
+    flex-direction:column;gap:10px;padding:12px 14px;
+    overflow-y:visible;
+  }
+  #settingsSec .sh{display:none;}
+
+  /* TABS — scrollable row */
+  .tabs{padding:0 8px;gap:0;}
+  .tab{padding:10px 11px;font-size:.7rem;}
+
+  /* TABLE — tighter */
+  th,td{padding:5px 7px;font-size:.7rem;}
+  .bulk{gap:5px;padding:6px 8px;flex-wrap:wrap;}
+  .bulk .btn{font-size:.68rem;padding:4px 8px;}
+  .search-input{width:120px;}
+  .search-input:focus{width:150px;}
+
+  /* MAP — smaller on mobile */
+  .mapp{width:100%!important;height:220px;border-top:1px solid var(--border);}
+  #lmap, #mapIframe{height:180px;}
+
+  /* STATS BOX */
+  .stats-box{font-size:.75rem;}
+
+  /* WELCOME MODAL — full screen on mobile */
+  .welcome-modal-bg{padding:0;align-items:flex-end;}
+  .welcome-box{
+    max-width:100%;border-radius:18px 18px 0 0;
+    max-height:92vh;overflow-y:auto;
+  }
+  .welcome-header{padding:16px 18px 14px;}
+  .welcome-header h2{font-size:1.05rem;}
+  .welcome-body{padding:16px 18px;}
+  .welcome-body p{font-size:.8rem;}
+  .welcome-list{gap:8px;margin-top:12px;}
+  .welcome-list li{font-size:.76rem;}
+  .welcome-footer{padding:0 18px 24px;}
+  .welcome-close-btn{width:100%;padding:13px;font-size:.88rem;border-radius:10px;}
+
+  /* ANALYSIS SUMMARY MODAL */
+  .summary-bg{padding:0;align-items:flex-end;}
+  .summary-box{border-radius:18px 18px 0 0;max-height:88vh;overflow-y:auto;}
+  .summary-hdr{padding:14px 18px;}
+  .summary-body{padding:14px 18px;}
+  .summary-close-btn{width:100%;padding:12px;border-radius:10px;}
+
+  /* CONFIRM MODAL */
+  .modal-bg{padding:0;align-items:flex-end;}
+  .modal-box{border-radius:18px 18px 0 0;padding:22px 20px 28px;}
+  .modal-btns{flex-direction:column-reverse;gap:8px;}
+  .modal-btns .btn{width:100%!important;padding:11px;}
+
+  /* EXPORT MODAL */
+  .expModal .modal-box{border-radius:18px 18px 0 0;}
+
+  /* VTAG */
+  .vtag{font-size:.55rem;max-width:200px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
+  /* RELEASE NOTES BTN — icon only on mobile */
+  .rn-btn{right:50px;font-size:.6rem;padding:0 8px;}
+  .rn-btn span.rn-label{display:none;}
+  /* RN MODAL */
+  .rn-modal-bg{padding:0;align-items:flex-end;}
+  .rn-box{border-radius:18px 18px 0 0;max-height:88vh;}
+}
 
 /* VERSION */
 .vtag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(26,95,138,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:ui-monospace,'SF Mono','Cascadia Code','Consolas','Menlo',monospace;background:rgba(255,255,255,0.6);padding:2px 7px;border-radius:10px;}
@@ -382,6 +489,10 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     <h1>Smart <span>Re-Mark</span></h1>
     <p>GPS Waypoint Deduplicator, Cleaner &amp; Format Converter</p>
   </div>
+  <button class="rn-btn" id="rnBtn" title="Release Notes">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="rn-label">What's New</span>
+  </button>
   <button class="help-btn" id="helpBtn" title="About Smart Re-Mark">?</button>
 </header>
 
@@ -691,6 +802,134 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
       <div class="summary-footer">
         <button class="summary-close-btn" id="summaryClose">Review Now →</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELEASE NOTES MODAL -->
+<div class="rn-modal-bg" id="rnModal">
+  <div class="rn-box">
+    <div class="rn-hdr">
+      <div>
+        <h3>📋 Release Notes</h3>
+        <p>Smart Re-Mark — version history</p>
+      </div>
+      <button class="rn-close" id="rnClose">✕</button>
+    </div>
+    <div class="rn-body">
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v2.1</span>
+          <span class="rn-vdate">Mar 2026</span>
+          <span class="rn-vbadge rn-latest">Latest</span>
+        </div>
+        <ul>
+          <li>Mobile-friendly layout — all modals become bottom sheets on small screens, tabs scroll horizontally, tables resize gracefully</li>
+          <li>Offline Safety — app works fully offline after first load; disconnect before loading marks, reconnect after export</li>
+          <li>Google Fonts replaced with system fonts — no network required for typography</li>
+          <li>Service Worker added — page caches itself on first visit for offline use</li>
+          <li>Privacy notice in sidebar and welcome modal with cache-clearing instructions</li>
+          <li>Release notes panel added (you're looking at it)</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v2.0</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Resizable map panel — drag the handle between content and map to make map wider or narrower</li>
+          <li>Search bar in All Marks tab — filter by name with partial match and highlighted results</li>
+          <li>Loading overlay with pulse animation when file loads and analysis runs</li>
+          <li>Welcome modal dissolves smoothly on close; fades in on page load</li>
+          <li>Map empty state shows clear "Select a mark to show on map" instruction</li>
+          <li>Title updated: "Re-Mark" now renders in light blue</li>
+          <li>Track points (trkpt) and route points (rtept) excluded from GPX import — only true waypoints loaded, fixing bloated file imports from Lowrance/Simrad devices</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v1.7</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Map zoom +/− buttons overlaid on the map panel</li>
+          <li>Google Maps embed shows satellite view at ~20km zoom by default</li>
+          <li>Welcome modal version number displayed in header</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v1.6</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Map display fixed after zoom button restructure</li>
+          <li>Google Maps open button moved inside map as bottom-right overlay</li>
+          <li>Analysis summary modal replaces bottom-right toast on file load</li>
+          <li>Welcome modal improvements: version shown, "when hosted" text removed</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v1.5</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Post-analysis result shown as centred summary modal with colour-coded breakdown</li>
+          <li>Welcome modal added on page load with feature overview and ? help button to reopen</li>
+          <li>GPX import now ignores track points and route points — only imports true waypoints</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v1.4</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Export consolidated into a single "Export My Marks" button</li>
+          <li>Export modal: name your file, choose format (GPX/CSV/KML) and coordinate format</li>
+          <li>Format auto-selected based on source file type</li>
+          <li>Binned marks exported automatically alongside clean marks on every export</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v1.3</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Multi-file loading — add multiple GPX/CSV/KML files and analyse across all of them</li>
+          <li>File chips list shows each loaded file with mark count; remove individual files</li>
+          <li>Cross-file deduplication — exact and near duplicates detected across all loaded files</li>
+        </ul>
+      </div>
+
+      <div class="rn-version">
+        <div class="rn-vtag">
+          <span class="rn-vnum">v1.0 – v1.2</span>
+          <span class="rn-vdate">Mar 2026</span>
+        </div>
+        <ul>
+          <li>Initial release — GPX, CSV, KML, TXT import and export</li>
+          <li>Exact duplicate detection and near-duplicate grouping by distance threshold</li>
+          <li>Same Name, Diff. Location tab — flags marks sharing a name but far apart</li>
+          <li>Export Name editing — rename marks for export without changing the original</li>
+          <li>Clean Preview and Binned tabs — see exactly what's kept vs removed</li>
+          <li>Normalise names (Proper Case) and append date options on export</li>
+          <li>4-column coordinate display — source format and alt format side by side</li>
+          <li>Ocean blue colour scheme with sandy accent</li>
+          <li>Auto-analysis on file load — no "Find Duplicates" button needed</li>
+        </ul>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1983,6 +2222,18 @@ function doExport(){
     e.preventDefault();
   }, {passive:false});
 })();
+
+// ─── RELEASE NOTES MODAL ─────────────────────────────
+document.getElementById('rnBtn').addEventListener('click',()=>{
+  document.getElementById('rnModal').classList.add('open');
+});
+document.getElementById('rnClose').addEventListener('click',()=>{
+  document.getElementById('rnModal').classList.remove('open');
+});
+document.getElementById('rnModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('rnModal'))
+    document.getElementById('rnModal').classList.remove('open');
+});
 
 // ─── WELCOME MODAL ───────────────────────────────────
 function openWelcome(){
