@@ -166,6 +166,9 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .ename{font-weight:600;cursor:text;border-bottom:1px dashed transparent;transition:border-color .15s;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
 .ename:hover{border-bottom-color:var(--accent);}
 .einput{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:600;border:1.5px solid var(--accent);border-radius:4px;padding:2px 5px;outline:none;width:100%;min-width:80px;display:block;background:#fff;color:var(--text);}
+.einput.err{border-color:var(--red);background:#fff5f5;animation:shake .25s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.einput-errmsg{font-size:.67rem;color:var(--red);font-weight:700;margin-top:2px;display:block;}
 
 /* MAP PANEL */
 .mapp{background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
@@ -245,6 +248,44 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .file-chip-row .fcx:hover{color:var(--red);}
 .btn-add-file{width:100%;background:var(--white);border:1.5px dashed var(--border2);color:var(--accent);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;border-radius:7px;padding:7px;cursor:pointer;transition:all .15s;margin-top:4px;}
 .btn-add-file:hover{border-color:var(--accent);background:var(--accent-lt);}
+
+/* MAP ZOOM OVERLAY BUTTONS */
+.map-zoom-wrap{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;}
+.map-zoom-wrap #mapIframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.zoom-btns{position:absolute;bottom:14px;left:12px;display:none;flex-direction:column;gap:3px;z-index:10;}
+.zoom-btns.visible{display:flex;}
+.zoom-btn{width:30px;height:30px;background:#fff;border:1.5px solid rgba(0,0,0,0.2);border-radius:4px;font-size:1.1rem;font-weight:700;color:#444;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);line-height:1;transition:background .12s;}
+.zoom-btn:hover{background:#f0f0f0;}
+
+/* ANALYSIS SUMMARY MODAL */
+.summary-bg{position:fixed;inset:0;background:rgba(13,59,94,0.55);z-index:15000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.summary-bg.open{opacity:1;pointer-events:all;}
+.summary-box{background:#eef3f9;border-radius:14px;max-width:460px;width:100%;box-shadow:0 12px 48px rgba(13,59,94,0.28);overflow:hidden;transform:scale(.95);transition:transform .22s;}
+.summary-bg.open .summary-box{transform:scale(1);}
+.summary-hdr{background:var(--header-bg);padding:18px 22px;display:flex;align-items:center;gap:10px;}
+.summary-hdr svg{flex-shrink:0;}
+.summary-hdr h3{color:#fff;font-size:1rem;font-weight:800;margin:0;}
+.summary-hdr p{color:rgba(200,220,240,0.7);font-size:.72rem;margin:3px 0 0;}
+.summary-body{padding:18px 22px;}
+.summary-rows{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.summary-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:.8rem;}
+.summary-row .sr-icon{font-size:1rem;flex-shrink:0;}
+.summary-row .sr-label{flex:1;font-weight:600;color:var(--text);}
+.summary-row .sr-count{font-family:'Source Code Pro',monospace;font-weight:700;font-size:.85rem;border-radius:20px;padding:2px 10px;}
+.sr-clean{background:var(--green-lt);}
+.sr-clean .sr-count{background:var(--green);color:#fff;}
+.sr-exact{background:var(--red-lt);}
+.sr-exact .sr-count{background:var(--red);color:#fff;}
+.sr-near{background:var(--orange-lt);}
+.sr-near .sr-count{background:var(--orange);color:#fff;}
+.sr-same{background:var(--purple-lt);}
+.sr-same .sr-count{background:var(--purple);color:#fff;}
+.sr-all{background:var(--accent-lt);}
+.sr-all .sr-count{background:var(--accent);color:#fff;}
+.summary-hint{font-size:.75rem;color:var(--text2);line-height:1.5;margin-bottom:16px;padding:9px 12px;background:rgba(26,95,138,0.07);border-radius:7px;border-left:3px solid var(--accent);}
+.summary-footer{display:flex;justify-content:flex-end;}
+.summary-close-btn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:9px 22px;font-family:'Nunito',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:background .15s;}
+.summary-close-btn:hover{background:var(--header-bg);}
 
 /* VERSION */
 .version-tag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:'Source Code Pro',monospace;}
@@ -339,20 +380,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
       <input type="checkbox" id="cbDate" onchange="buildClean()">
       <div><label for="cbDate">Append date to mark names</label><span>e.g. Spot 1 - Valid 18/03/2026</span></div>
     </div>
-    <div class="fmt-row">
-      <label>Coordinate format:</label>
-      <select class="fmt-select" id="expFmt">
-        <option value="source">Same as source</option>
-        <option value="dd">Decimal Degrees (DD)</option>
-        <option value="ddm">Deg. Decimal Min. (DDM)</option>
-        <option value="dms">Deg. Min. Sec. (DMS)</option>
-      </select>
-    </div>
-    <div class="exp-grid">
-      <button class="btn btn-green btn-sm" id="expGPX">GPX</button>
-      <button class="btn btn-outline btn-sm" id="expCSV">CSV</button>
-      <button class="btn btn-outline btn-sm" id="expKML">KML</button>
-    </div>
+    <button class="btn btn-green btn-full" id="expBtn" style="margin-top:4px;padding:11px;font-size:.88rem;">⬇ Export My Marks</button>
   </div>
 </aside>
 
@@ -479,11 +507,25 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     </div>
   </div>
   <div class="mhold" id="mhold">
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-    <p style="font-weight:700;color:var(--text2);margin:0">Click any mark to preview</p>
-    <p style="font-size:.72rem;color:var(--muted);margin:0">Shows location + opens in Google Maps</p>
+    <!-- Animated pin icon -->
+    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" style="color:#a8bdd4">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    <p style="font-weight:800;font-size:.95rem;color:var(--text2);margin:0;letter-spacing:-.01em">Select a mark to show on map</p>
+    <p style="font-size:.76rem;color:var(--muted);margin:0;max-width:190px;line-height:1.5">Click any row in the table to preview its satellite location here</p>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:4px;background:rgba(26,95,138,0.08);border-radius:20px;padding:5px 12px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      <span style="font-size:.7rem;font-weight:700;color:var(--accent)">Opens in Google Maps ↗ when hosted</span>
+    </div>
   </div>
-  <iframe id="mapIframe" style="display:none;flex:1;border:none;width:100%;min-height:0;" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <div class="map-zoom-wrap" id="mapZoomWrap" style="display:none;">
+    <iframe id="mapIframe" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="zoom-btns visible" id="zoomBtns">
+      <button class="zoom-btn" id="zoomIn"  title="Zoom in">+</button>
+      <button class="zoom-btn" id="zoomOut" title="Zoom out">−</button>
+    </div>
+  </div>
   <div id="mapLinks" style="display:none;padding:8px 10px;border-top:1px solid var(--border);background:var(--card);flex-shrink:0;text-align:center;"></div>
   <div class="mcoords" id="mcoords" style="display:none"></div>
 </div>
@@ -550,6 +592,26 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   </div>
 </div>
 
+<!-- ANALYSIS SUMMARY MODAL -->
+<div class="summary-bg" id="summaryModal">
+  <div class="summary-box">
+    <div class="summary-hdr">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <h3 id="summaryTitle">Analysis Complete</h3>
+        <p id="summarySubtitle">Here's what we found in your file</p>
+      </div>
+    </div>
+    <div class="summary-body">
+      <div class="summary-rows" id="summaryRows"></div>
+      <div class="summary-hint" id="summaryHint"></div>
+      <div class="summary-footer">
+        <button class="summary-close-btn" id="summaryClose">Review Now →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM MODAL -->
 <div class="modal-bg" id="modal">
   <div class="modal-box">
@@ -564,12 +626,41 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 </div>
 <!-- EXPORT NAME MODAL -->
 <div class="modal-bg" id="expModal">
-  <div class="modal-box" style="max-width:420px">
+  <div class="modal-box" style="max-width:460px">
     <div class="modal-icon">💾</div>
     <div class="modal-title">Export Your Marks</div>
-    <div class="modal-msg" style="margin-bottom:12px">Choose a name for your file. The extension will be added automatically.</div>
+    <div class="modal-msg" style="margin-bottom:12px">Name your file, choose a format, and download.</div>
+
     <input type="text" class="exp-modal-input" id="expFileName" placeholder="e.g. My Fishing Marks June 2026" maxlength="80">
     <div class="exp-modal-hint" id="expFilePreview"></div>
+
+    <!-- File format selector -->
+    <div style="margin-bottom:10px">
+      <div style="font-size:.74rem;font-weight:700;color:var(--text2);margin-bottom:7px;">File format</div>
+      <div style="display:flex;gap:8px;">
+        <label id="fmt-gpx-lbl" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border:1.5px solid var(--accent);border-radius:7px;cursor:pointer;background:var(--accent-lt);font-weight:700;font-size:.8rem;color:var(--accent);">
+          <input type="radio" name="expFileFmt" value="gpx" checked style="accent-color:var(--accent);"> GPX
+        </label>
+        <label id="fmt-csv-lbl" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border:1.5px solid var(--border2);border-radius:7px;cursor:pointer;font-weight:700;font-size:.8rem;color:var(--text2);">
+          <input type="radio" name="expFileFmt" value="csv" style="accent-color:var(--accent);"> CSV
+        </label>
+        <label id="fmt-kml-lbl" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border:1.5px solid var(--border2);border-radius:7px;cursor:pointer;font-weight:700;font-size:.8rem;color:var(--text2);">
+          <input type="radio" name="expFileFmt" value="kml" style="accent-color:var(--accent);"> KML
+        </label>
+      </div>
+    </div>
+
+    <!-- Coordinate format selector -->
+    <div class="fmt-row" style="margin-bottom:10px">
+      <label style="font-size:.74rem;font-weight:700;color:var(--text2);">Coordinate format:</label>
+      <select class="fmt-select" id="expFmt">
+        <option value="source">Same as source</option>
+        <option value="dd">Decimal Degrees (DD)</option>
+        <option value="ddm">Deg. Decimal Min. (DDM)</option>
+        <option value="dms">Deg. Min. Sec. (DMS)</option>
+      </select>
+    </div>
+
     <div class="exp-modal-binned" id="expBinnedNote" style="display:none"></div>
     <div class="modal-btns">
       <button class="btn btn-outline btn-sm" id="expModalCancel" style="width:auto">Cancel</button>
@@ -584,6 +675,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 // ─── STATE ───────────────────────────────────────────
 let WP=[],EG=[],NG=[],SN=[],CS=[],BS=[]; // waypoints, exactGroups, nearGroups, sameNameGroups, cleanSet, binnedSet
 let analysed=false, selIds=new Set();
+let _mapZoom=11, _mapPts=[];
 
 // ─── TOAST ───────────────────────────────────────────
 function toast(m,t){const el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' t'+t:'');clearTimeout(el._t);el._t=setTimeout(()=>el.className='',3400);}
@@ -626,7 +718,8 @@ function _showMap(pts){
   const links  = document.getElementById('mapLinks');
 
   if(!pts||!pts.length){
-    hold.classList.remove('gone'); iframe.style.display='none';
+    hold.classList.remove('gone');
+    document.getElementById('mapZoomWrap').style.display='none';
     links.style.display='none'; coords.style.display='none';
     htxt.textContent='Select a mark to see its location';
     hsub.textContent='Click any row in the table';
@@ -635,7 +728,7 @@ function _showMap(pts){
 
   hold.classList.add('gone');
   dot.className='mdot on';
-  iframe.style.display='block';
+  document.getElementById('mapZoomWrap').style.display='flex';
 
   // zoom=11 ≈ ~20km view radius, centred on the mark
   // t=h gives hybrid satellite view (satellite imagery + labels)
@@ -646,7 +739,8 @@ function _showMap(pts){
     hsub.textContent = ddm(p.lat,true)+'   '+ddm(p.lon,false);
 
     // Google Maps embed with satellite/hybrid tile, red marker pin, zoom 11 (~20km)
-    iframe.src = `https://maps.google.com/maps?q=${p.lat.toFixed(6)},${p.lon.toFixed(6)}&z=11&t=h&output=embed`;
+    _mapZoom=11; _mapPts=pts;
+    iframe.src = `https://maps.google.com/maps?q=${p.lat.toFixed(6)},${p.lon.toFixed(6)}&z=${_mapZoom}&t=h&output=embed`;
 
     links.style.display='block';
     const gmUrl=`https://www.google.com/maps/search/?api=1&query=${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
@@ -659,7 +753,8 @@ function _showMap(pts){
     htxt.textContent = pts.length+' marks';
     hsub.textContent = 'Click a row for individual detail';
 
-    iframe.src = `https://maps.google.com/maps?q=${cLat},${cLon}&z=11&t=h&output=embed`;
+    _mapZoom=11; _mapPts=pts;
+    iframe.src = `https://maps.google.com/maps?q=${cLat},${cLon}&z=${_mapZoom}&t=h&output=embed`;
 
     links.style.display='block';
     const gmUrl=`https://www.google.com/maps/search/?api=1&query=${cLat},${cLon}`;
@@ -670,6 +765,27 @@ function _showMap(pts){
   coords.style.display='block';
   coords.innerHTML=pts.map(p=>`<div class="mcrow"><span class="mcname">${esc(p.name)}</span><span class="mcdms">${dms(p.lat,true)}<br>${dms(p.lon,false)}</span></div>`).join('');
 }
+
+// ─── MAP ZOOM BUTTONS ────────────────────────────────
+function applyMapZoom(){
+  if(!_mapPts||!_mapPts.length)return;
+  const iframe=document.getElementById('mapIframe');
+  if(_mapPts.length===1){
+    const p=_mapPts[0];
+    iframe.src=`https://maps.google.com/maps?q=${p.lat.toFixed(6)},${p.lon.toFixed(6)}&z=${_mapZoom}&t=h&output=embed`;
+  } else {
+    const lats=_mapPts.map(p=>p.lat),lons=_mapPts.map(p=>p.lon);
+    const cLat=((Math.min(...lats)+Math.max(...lats))/2).toFixed(6);
+    const cLon=((Math.min(...lons)+Math.max(...lons))/2).toFixed(6);
+    iframe.src=`https://maps.google.com/maps?q=${cLat},${cLon}&z=${_mapZoom}&t=h&output=embed`;
+  }
+}
+document.getElementById('zoomIn').addEventListener('click',()=>{
+  if(_mapZoom<20){_mapZoom++;applyMapZoom();}
+});
+document.getElementById('zoomOut').addEventListener('click',()=>{
+  if(_mapZoom>2){_mapZoom--;applyMapZoom();}
+});
 
 // ─── COORD FORMATTERS ────────────────────────────────
 function dms(v,isLat){
@@ -747,38 +863,67 @@ function makeEN(w){
     const inp=document.createElement('input');
     inp.className='einput'; inp.value=dname;
     sp.replaceWith(inp); inp.focus(); inp.select();
+    // Error message element shown below the input
+    const errMsg=document.createElement('span');
+    errMsg.className='einput-errmsg';
+    inp.insertAdjacentElement('afterend',errMsg);
+
+    function showErr(msg){
+      inp.classList.add('err');
+      errMsg.textContent=msg;
+      inp.select();
+      // Clear the shake class after animation so it can retrigger
+      setTimeout(()=>inp.classList.remove('err'),300);
+    }
+    function clearErr(){errMsg.textContent='';}
+
+    function checkDuplicate(v){
+      // Returns true if v (case-insensitive) matches the export name of
+      // any OTHER waypoint that is at a meaningfully different location
+      const thr=parseFloat(document.getElementById('thresh').value);
+      const vl=v.trim().toLowerCase();
+      return WP.some(other=>{
+        if(other.id===w.id) return false;  // skip self
+        const otherName=((other.en&&other.en.trim())?other.en:other.name||'').trim().toLowerCase();
+        if(otherName!==vl) return false;
+        // Same name — only block if they're further apart than the threshold
+        // (within threshold = near-dupe, already handled by that tab)
+        return hav(w.lat,w.lon,other.lat,other.lon)>thr;
+      });
+    }
+
     function save(){
       const v=inp.value.trim()||w.name;
       const changed = v !== (w.en||w.name);
+
+      // ── VALIDATION: block if name matches another distant mark ──
+      if(changed && checkDuplicate(v)){
+        showErr('That name already exists on another mark — please choose a unique name.');
+        return; // do NOT commit — keep input open for correction
+      }
+
+      clearErr();
       w.en=v;
       const ns=makeEN(w);inp.replaceWith(ns);
-      buildClean();
-      // If name was changed and this mark is in a same-name group,
-      // auto-tick its Keep checkbox so they don't have to do it manually
+
       if(changed){
-        SN.forEach((g,gi)=>{
-          const isMember=g.members.some(m=>m.id===w.id);
-          if(!isMember)return;
-          const cb=document.querySelector('.snc'+gi+'[value="'+w.id+'"]');
-          if(cb&&!cb.checked){
-            cb.checked=true;
-            snToggle(w.id,gi,true);
-            toast('✏️ Renamed & marked to keep','g');
-            return;
-          }
-        });
-      }
-      if(!changed||!SN.some(g=>g.members.some(m=>m.id===w.id))){
+        reanalyseSameNames();
+        if(!SN.some(g=>g.members.some(m=>m.id===w.id))){
+          toast('✏️ Renamed successfully','g');
+        }
+      } else {
+        buildClean();
         toast('✏️ Export name updated','g');
       }
     }
-    function cancel(){const ns=makeEN(w);inp.replaceWith(ns);}
+    function cancel(){errMsg.remove();const ns=makeEN(w);inp.replaceWith(ns);}
     inp.addEventListener('blur',save);
     inp.addEventListener('keydown',e2=>{
       if(e2.key==='Enter'){e2.preventDefault();inp.removeEventListener('blur',save);save();}
       if(e2.key==='Escape'){e2.preventDefault();inp.removeEventListener('blur',save);cancel();}
       e2.stopPropagation();
     });
+    inp.addEventListener('input',clearErr);
     inp.addEventListener('click',e2=>e2.stopPropagation());
   });
   return sp;
@@ -809,7 +954,28 @@ function detectFmt(txt,ext){
 
 function parseGPX(txt,fn){
   const doc=new DOMParser().parseFromString(txt,'application/xml');
-  return[...doc.querySelectorAll('wpt,trkpt,rtept')].map((n,i)=>{
+  // Only import <wpt> elements — these are true user-created waypoints/marks.
+  // <trkpt> (track trail points) and <rtept> (route points) are intentionally
+  // excluded: track points form continuous logged paths and are not named marks.
+  const wpts=[...doc.querySelectorAll('wpt')];
+  const skippedTrk=[...doc.querySelectorAll('trkpt')].length;
+  const skippedRte=[...doc.querySelectorAll('rtept')].length;
+  const skipped=skippedTrk+skippedRte;
+  if(skipped>0){
+    // Store skip count on the result array so loadFile can surface it to the user
+    const result=wpts.map((n,i)=>{
+      const lat=parseFloat(n.getAttribute('lat')),lon=parseFloat(n.getAttribute('lon'));
+      if(isNaN(lat)||isNaN(lon))return null;
+      const nm=n.querySelector('name')?.textContent?.trim()||'WPT-'+String(i+1).padStart(4,'0');
+      const ts=n.querySelector('time')?.textContent?.trim();
+      return{lat,lon,name:nm,dt:ts?new Date(ts):null,sf:'gpx',ff:fn};
+    }).filter(Boolean);
+    result._skipped=skipped;
+    result._skippedTrk=skippedTrk;
+    result._skippedRte=skippedRte;
+    return result;
+  }
+  return wpts.map((n,i)=>{
     const lat=parseFloat(n.getAttribute('lat')),lon=parseFloat(n.getAttribute('lon'));
     if(isNaN(lat)||isNaN(lon))return null;
     const nm=n.querySelector('name')?.textContent?.trim()||'WPT-'+String(i+1).padStart(4,'0');
@@ -870,6 +1036,61 @@ function hav(a,b,c,d){
 }
 function fdist(m){return m<1000?m.toFixed(0)+'m':(m/1000).toFixed(2)+'km';}
 
+// ─── SAME NAME GROUP BUILDER ─────────────────────────
+// Separated so it can be called independently after a rename
+// without re-running the full coord-duplicate analysis.
+// Uses export names (w.en || w.name) for matching.
+function buildSameNameGroups(thr){
+  SN=[];
+  const thr2=thr!=null?thr:parseFloat(document.getElementById('thresh').value);
+  // Preserve existing keepInGroup states by id before rebuilding
+  const prevKeep={};
+  WP.forEach(w=>{if(w.snFlag)prevKeep[w.id]=w.keepInGroup;});
+  WP.forEach(w=>w.snFlag=false);
+
+  const nm=new Map();
+  WP.forEach(w=>{
+    const k=((w.en&&w.en.trim())?w.en:w.name||'').trim().toLowerCase();
+    if(!nm.has(k))nm.set(k,[]);
+    nm.get(k).push(w);
+  });
+  nm.forEach((g)=>{
+    if(g.length<2)return;
+    let maxD=0;
+    for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){
+      const d=hav(g[i].lat,g[i].lon,g[j].lat,g[j].lon);
+      if(d>maxD)maxD=d;
+    }
+    if(maxD<=thr2)return;
+    const s=[...g].sort((a,b)=>{if(a.dt&&b.dt)return b.dt-a.dt;if(a.dt)return-1;if(b.dt)return 1;return 0;});
+    s.forEach((w,i)=>{
+      w.snFlag=true;
+      // Restore previous keepInGroup if known; otherwise default first member to kept
+      w.keepInGroup=(w.id in prevKeep)?prevKeep[w.id]:(i===0);
+    });
+    const displayName=(s[0].en&&s[0].en.trim())?s[0].en:s[0].name;
+    SN.push({name:displayName,members:s,maxD});
+  });
+}
+
+// ─── SAME NAME RE-CHECK (after rename) ───────────────
+// Rebuilds SN without touching EG / NG / WP status flags.
+function reanalyseSameNames(){
+  buildSameNameGroups(null);
+  document.getElementById('sSame').textContent=SN.length;
+  document.getElementById('snDisp').textContent=document.getElementById('thresh').value+'m';
+  badges();
+  renderSameName();
+  buildClean();
+  if(SN.length){
+    // Softly notify the user if new conflicts appeared
+    const conflicts=SN.filter(g=>g.members.some(m=>!m.keepInGroup));
+    if(conflicts.length){
+      toast(`⚠️ ${SN.length} same-name conflict${SN.length>1?'s':''} detected — check the Same Name tab`,'o');
+    }
+  }
+}
+
 // ─── ANALYSIS ────────────────────────────────────────
 function analyse(){
   const thr=parseFloat(document.getElementById('thresh').value);
@@ -900,17 +1121,9 @@ function analyse(){
   });
 
   // Same name, different location
-  const nm=new Map();
-  WP.forEach(w=>{const k=(w.name||'').trim().toLowerCase();if(!nm.has(k))nm.set(k,[]);nm.get(k).push(w);});
-  nm.forEach((g,k)=>{
-    if(g.length<2)return;
-    let maxD=0;
-    for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const d=hav(g[i].lat,g[i].lon,g[j].lat,g[j].lon);if(d>maxD)maxD=d;}
-    if(maxD<=thr)return;
-    const s=[...g].sort((a,b)=>{if(a.dt&&b.dt)return b.dt-a.dt;if(a.dt)return-1;if(b.dt)return 1;return 0;});
-    s.forEach(w=>w.snFlag=true);
-    SN.push({name:g[0].name,members:s,maxD});
-  });
+  // Matches on EXPORT NAME (w.en) so renames are reflected immediately
+  WP.forEach(w=>w.snFlag=false);  // reset before re-grouping
+  buildSameNameGroups(thr);
 
   // Stats
   const ex=WP.filter(w=>w.status==='exact_dupe').length;
@@ -932,15 +1145,59 @@ function analyse(){
 
   badges(); renderAll(); renderExact(); renderNear(); renderSameName(); buildClean();
   analysed=true;
-  const found=ex+nr;
-  let msg=found>0?`Found ${ex} exact + ${nr} near-duplicates`:'✓ No coordinate duplicates';
-  if(SN.length)msg+=` · ${SN.length} same-name conflict${SN.length>1?'s':''}`;
-  toast(msg,found>0||SN.length?'o':'g');
-  if(EG.length)setTab('exact');
-  else if(NG.length)setTab('near');
-  else if(SN.length)setTab('samename');
-  else setTab('clean');
+  showAnalysisSummary(ex, nr, SN.length, tot, CS.length);
 }
+
+// ─── ANALYSIS SUMMARY MODAL ──────────────────────────
+function showAnalysisSummary(ex, nr, sn, total, clean){
+  const rows=document.getElementById('summaryRows');
+  const hint=document.getElementById('summaryHint');
+  const title=document.getElementById('summaryTitle');
+  const sub=document.getElementById('summarySubtitle');
+  const issues=ex+nr+sn;
+
+  title.textContent = issues===0 ? '✓ All Marks Look Clean' : 'Analysis Complete';
+  sub.textContent = `${total} mark${total!==1?'s':''} loaded from ${loadedFileMeta.length} file${loadedFileMeta.length!==1?'s':''}`;
+
+  rows.innerHTML='';
+  // Total loaded
+  rows.innerHTML+=`<div class="summary-row sr-all"><span class="sr-icon">📍</span><span class="sr-label">Total marks loaded</span><span class="sr-count">${total}</span></div>`;
+  // Clean
+  rows.innerHTML+=`<div class="summary-row sr-clean"><span class="sr-icon">✅</span><span class="sr-label">Unique marks to keep</span><span class="sr-count">${clean}</span></div>`;
+  // Exact dupes
+  if(ex>0) rows.innerHTML+=`<div class="summary-row sr-exact"><span class="sr-icon">🔁</span><span class="sr-label">Exact duplicates found</span><span class="sr-count">${ex}</span></div>`;
+  // Near dupes
+  if(nr>0) rows.innerHTML+=`<div class="summary-row sr-near"><span class="sr-icon">📏</span><span class="sr-label">Near-duplicates found</span><span class="sr-count">${nr}</span></div>`;
+  // Same name
+  if(sn>0) rows.innerHTML+=`<div class="summary-row sr-same"><span class="sr-icon">🏷</span><span class="sr-label">Same-name conflicts</span><span class="sr-count">${sn}</span></div>`;
+
+  // Hint text
+  if(issues===0){
+    hint.textContent='No duplicates or conflicts were found. Head to the Clean Preview tab to review your marks, then export when ready.';
+  } else {
+    const tabs=[];
+    if(ex>0) tabs.push('Exact Duplicates');
+    if(nr>0) tabs.push('Near Duplicates');
+    if(sn>0) tabs.push('Same Name, Diff. Location');
+    hint.innerHTML=`Review each flagged group using the tabs at the top: <strong>${tabs.join(', ')}</strong>. Tick the marks you want to keep, then export from the sidebar when done.`;
+  }
+
+  // Navigate to the most important tab in the background
+  if(EG.length) setTab('exact');
+  else if(NG.length) setTab('near');
+  else if(SN.length) setTab('samename');
+  else setTab('clean');
+
+  document.getElementById('summaryModal').classList.add('open');
+}
+
+document.getElementById('summaryClose').addEventListener('click',()=>{
+  document.getElementById('summaryModal').classList.remove('open');
+});
+document.getElementById('summaryModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('summaryModal'))
+    document.getElementById('summaryModal').classList.remove('open');
+});
 
 // ─── BADGES ──────────────────────────────────────────
 function badges(){
@@ -1275,8 +1532,9 @@ function renderFileChips(){
   list.innerHTML='';
   loadedFileMeta.forEach((fm,idx)=>{
     const row=document.createElement('div');row.className='file-chip-row';
+    const skipNote=fm.skipped>0?` <span title="${fm.skipped} track/route points excluded" style="color:var(--orange);cursor:help">+${fm.skipped} skipped</span>`:'';
     row.innerHTML=`<span class="fcn" title="${esc(fm.name)}">${esc(fm.name)}</span>
-      <span class="fcc">${fm.count} marks</span>
+      <span class="fcc">${fm.count} marks${skipNote}</span>
       <button class="fcx" title="Remove this file" onclick="removeFileMeta(${idx})">✕</button>`;
     list.appendChild(row);
   });
@@ -1312,17 +1570,22 @@ function loadFile(file){
     const raw=parseFile(file.name,e.target.result);
     if(!raw.length){toast('No marks found in '+file.name,'r');return;}
     const fmt=(raw[0]?.sf||'dd').toUpperCase();
+    const skipped=raw._skipped||0;
     const newWP=finalize(raw);
     // ACCUMULATE — add to existing waypoints
     WP=[...WP,...newWP];
     selIds.clear();
-    loadedFileMeta.push({name:file.name,count:raw.length,fmt});
+    loadedFileMeta.push({name:file.name,count:raw.length,fmt,skipped});
     document.getElementById('uploadSec').style.display='none';
     document.getElementById('loadedSec').style.display='block';
     renderFileChips();
     renderAll();badges();
     const total=loadedFileMeta.reduce((s,m)=>s+m.count,0);
-    toast(`✓ Added ${raw.length} marks from ${file.name} — ${total} total, analysing…`,'g');
+    // If track/route points were skipped, show a gentle notice
+    if(skipped>0){
+      toast(`ℹ️ ${skipped} track/route point${skipped>1?'s':''} skipped — only waypoint marks imported`,'');
+    }
+    // summary modal shown after analyse() completes — no toast needed here
     setTimeout(()=>analyse(),80);
   };
   r.readAsText(file);
@@ -1421,13 +1684,32 @@ function dl(name,content,mime){const a=document.createElement('a');a.href=URL.cr
 function expSet(){return analysed?CS:WP;}
 
 // ─── EXPORT MODAL ─────────────────────────────────────
-let _expFmt='gpx';
 let loadedFileMeta=[];
 
-function openExportModal(fmt){
-  _expFmt=fmt;
+function getSelectedFileFmt(){
+  // Returns the selected radio value, falling back to source format of loaded files
+  const sel=document.querySelector('input[name="expFileFmt"]:checked');
+  if(sel) return sel.value;
+  // Fallback: detect from first loaded file extension
+  const fname=(loadedFileMeta[0]?.name||'').toLowerCase();
+  if(fname.endsWith('.kml'))return'kml';
+  if(fname.endsWith('.csv')||fname.endsWith('.txt'))return'csv';
+  return'gpx';
+}
+
+function openExportModal(){
   const pts=expSet();
   if(!pts.length){toast('Nothing to export','o');return;}
+
+  // Pre-select the radio matching the source file format
+  const fname=(loadedFileMeta[0]?.name||'').toLowerCase();
+  let defaultFmt='gpx';
+  if(fname.endsWith('.kml'))defaultFmt='kml';
+  else if(fname.endsWith('.csv')||fname.endsWith('.txt'))defaultFmt='csv';
+  const radio=document.querySelector(`input[name="expFileFmt"][value="${defaultFmt}"]`);
+  if(radio) radio.checked=true;
+  updateFmtLabels();
+
   const input=document.getElementById('expFileName');
   const loaded=loadedFileMeta.length===1?(loadedFileMeta[0].name||'smartremark').replace(/\.[^.]+$/,''):'smartremark_merged';
   input.value=loaded;
@@ -1446,10 +1728,28 @@ function openExportModal(fmt){
   input.focus(); input.select();
 }
 
+function updateFmtLabels(){
+  // Highlight the selected format radio label
+  const sel=document.querySelector('input[name="expFileFmt"]:checked')?.value;
+  ['gpx','csv','kml'].forEach(f=>{
+    const lbl=document.getElementById('fmt-'+f+'-lbl');
+    if(!lbl)return;
+    const active=sel===f;
+    lbl.style.borderColor=active?'var(--accent)':'var(--border2)';
+    lbl.style.background=active?'var(--accent-lt)':'';
+    lbl.style.color=active?'var(--accent)':'var(--text2)';
+  });
+  updateExpPreview();
+}
+
+// Wire radio changes to update labels + preview
+document.querySelectorAll('input[name="expFileFmt"]').forEach(r=>r.addEventListener('change',updateFmtLabels));
+
 function updateExpPreview(){
   const raw=document.getElementById('expFileName').value.trim()||'my-marks';
   const safe=raw.replace(/[\/\\:*?"<>|]/g,'_');
-  document.getElementById('expFilePreview').textContent=`File will be saved as: ${safe}.${_expFmt}`;
+  const fmt=getSelectedFileFmt();
+  document.getElementById('expFilePreview').textContent=`File will be saved as: ${safe}.${fmt}`;
 }
 
 document.getElementById('expFileName').addEventListener('input',updateExpPreview);
@@ -1464,18 +1764,19 @@ document.getElementById('expModal').addEventListener('click',e=>{if(e.target===d
 function doExport(){
   const raw=document.getElementById('expFileName').value.trim()||'my-marks';
   const safe=raw.replace(/[\/\\:*?"<>|]/g,'_');
-  const fmt=document.getElementById('expFmt').value;
+  const coordFmt=document.getElementById('expFmt').value;
+  const fileFmt=getSelectedFileFmt();
   const pts=expSet();
   document.getElementById('expModal').classList.remove('open');
 
-  if(_expFmt==='gpx'){
-    dl(safe+'.gpx',buildGPX(pts,'Smart Re-Mark',fmt),'application/gpx+xml');
-  } else if(_expFmt==='csv'){
+  if(fileFmt==='gpx'){
+    dl(safe+'.gpx',buildGPX(pts,'Smart Re-Mark',coordFmt),'application/gpx+xml');
+  } else if(fileFmt==='csv'){
     const hdr='name,lat_src,lon_src,lat_dd,lon_dd';
-    const rows=pts.map(w=>`"${label(w).replace(/"/g,'""')}","${exportCoord(w,true,fmt)}","${exportCoord(w,false,fmt)}",${w.lat.toFixed(8)},${w.lon.toFixed(8)}`);
+    const rows=pts.map(w=>`"${label(w).replace(/"/g,'""')}","${exportCoord(w,true,coordFmt)}","${exportCoord(w,false,coordFmt)}",${w.lat.toFixed(8)},${w.lon.toFixed(8)}`);
     dl(safe+'.csv',[hdr,...rows].join('\n'),'text/csv');
-  } else if(_expFmt==='kml'){
-    const pm=pts.map(w=>`  <Placemark>\n    <n>${eX(label(w))}</n>\n    <description>${eX(exportCoord(w,true,fmt)+', '+exportCoord(w,false,fmt))}</description>\n    <Point><coordinates>${w.lon.toFixed(8)},${w.lat.toFixed(8)},0</coordinates></Point>\n  </Placemark>`);
+  } else if(fileFmt==='kml'){
+    const pm=pts.map(w=>`  <Placemark>\n    <n>${eX(label(w))}</n>\n    <description>${eX(exportCoord(w,true,coordFmt)+', '+exportCoord(w,false,coordFmt))}</description>\n    <Point><coordinates>${w.lon.toFixed(8)},${w.lat.toFixed(8)},0</coordinates></Point>\n  </Placemark>`);
     dl(safe+'.kml',`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>\n<n>${eX(raw)}</n>\n${pm.join('\n')}\n</Document></kml>`,'application/vnd.google-earth.kml+xml');
   }
 
@@ -1484,10 +1785,10 @@ function doExport(){
     const bfn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}.gpx`;
     setTimeout(()=>{
       dl(bfn,buildGPX(BS,'Smart Re-Mark BinnedMarks','source'),'application/gpx+xml');
-      toast(`✓ ${pts.length} marks → ${safe}.${_expFmt}   ·   ${BS.length} binned → ${bfn}`,'g');
+      toast(`✓ ${pts.length} marks → ${safe}.${fileFmt}   ·   ${BS.length} binned → ${bfn}`,'g');
     },300);
   } else {
-    toast(`✓ ${pts.length} marks saved as ${safe}.${_expFmt}`,'g');
+    toast(`✓ ${pts.length} marks saved as ${safe}.${fileFmt}`,'g');
   }
 }
 
@@ -1502,10 +1803,8 @@ document.getElementById('welcomeModal').addEventListener('click',e=>{
     document.getElementById('welcomeModal').classList.add('closed');
 });
 
-document.getElementById('expGPX').addEventListener('click',()=>openExportModal('gpx'));
-document.getElementById('expCSV').addEventListener('click',()=>openExportModal('csv'));
-document.getElementById('expKML').addEventListener('click',()=>openExportModal('kml'));
+document.getElementById('expBtn').addEventListener('click',()=>openExportModal());
 </script>
-<div class="vtag">v1.3</div>
+<div class="vtag">v1.5</div>
 </body>
 </html>
