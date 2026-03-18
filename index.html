@@ -29,7 +29,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;min-height:100vh;}
 
 /* HEADER */
-header{background:var(--header-bg);border-bottom:none;padding:13px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(13,59,94,0.35);position:relative;z-index:20;}
+header{background:var(--header-bg);border-bottom:none;padding:13px 24px;padding-right:62px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(13,59,94,0.35);position:relative;z-index:20;}
 .logo{width:44px;height:44px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.22);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 header h1{font-size:1.35rem;font-weight:800;line-height:1;color:#fff;}
 header h1 span{color:var(--sand);}
@@ -212,6 +212,30 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   font-size:.76rem; color:var(--red); margin-bottom:16px; line-height:1.5;
 }
 
+/* WELCOME MODAL */
+.welcome-modal-bg{position:fixed;inset:0;background:rgba(13,59,94,0.7);z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.welcome-modal-bg.closed{display:none;}
+.welcome-box{background:#eef3f9;border-radius:16px;max-width:520px;width:100%;box-shadow:0 16px 60px rgba(13,59,94,0.35);overflow:hidden;}
+.welcome-header{background:var(--header-bg);padding:22px 26px 18px;display:flex;align-items:center;gap:14px;}
+.welcome-logo{width:48px;height:48px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.22);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.welcome-header h2{color:#fff;font-size:1.25rem;font-weight:800;line-height:1.1;}
+.welcome-header p{color:rgba(200,220,240,0.75);font-size:.73rem;margin-top:3px;}
+.welcome-body{padding:22px 26px;}
+.welcome-body p{font-size:.83rem;color:var(--text2);margin-bottom:14px;line-height:1.6;}
+.welcome-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+.welcome-list li{display:flex;align-items:flex-start;gap:10px;font-size:.8rem;color:var(--text);line-height:1.5;}
+.welcome-list li .wi{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;margin-top:1px;}
+.welcome-list li .wt strong{display:block;font-weight:700;font-size:.8rem;color:var(--text);}
+.welcome-list li .wt span{font-size:.74rem;color:var(--text2);}
+.welcome-footer{padding:0 26px 22px;display:flex;justify-content:flex-end;}
+.welcome-close-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .15s;}
+.welcome-close-btn:hover{background:var(--header-bg);}
+
+/* HELP BUTTON */
+.help-btn{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;z-index:30;flex-shrink:0;}
+.help-btn:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5);}
+.help-btn title{display:none;}
+
 /* VERSION */
 .version-tag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:'Source Code Pro',monospace;}
 
@@ -251,6 +275,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     <h1>Smart <span>Re-Mark</span></h1>
     <p>GPS Waypoint Deduplicator, Cleaner &amp; Format Converter</p>
   </div>
+  <button class="help-btn" id="helpBtn" title="About Smart Re-Mark">?</button>
 </header>
 
 <div class="shell">
@@ -450,6 +475,67 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   <div id="mapLinks" style="display:none;padding:8px 10px;border-top:1px solid var(--border);background:var(--card);flex-shrink:0;text-align:center;"></div>
   <div class="mcoords" id="mcoords" style="display:none"></div>
 </div>
+</div>
+
+<!-- WELCOME MODAL -->
+<div class="welcome-modal-bg" id="welcomeModal">
+  <div class="welcome-box">
+    <div class="welcome-header">
+      <div class="welcome-logo">
+        <svg width="34" height="34" viewBox="0 0 38 38" fill="none">
+          <path d="M10 6c-2.2 0-4 1.8-4 4 0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" fill="rgba(200,225,245,0.55)"/>
+          <circle cx="10" cy="10" r="1.6" fill="rgba(255,255,255,0.8)"/>
+          <path d="M28 6c-2.2 0-4 1.8-4 4 0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" fill="rgba(200,225,245,0.55)"/>
+          <circle cx="28" cy="10" r="1.6" fill="rgba(255,255,255,0.8)"/>
+          <path d="M19 3c-3 0-5.5 2.5-5.5 5.5 0 4 5.5 10.5 5.5 10.5S24.5 12.5 24.5 8.5C24.5 5.5 22 3 19 3z" fill="white"/>
+          <circle cx="19" cy="8.5" r="2.2" fill="#c4963a"/>
+          <circle cx="13" cy="23" r="2.5" fill="rgba(200,225,245,0.5)"/>
+          <circle cx="19" cy="25" r="2.5" fill="rgba(200,225,245,0.6)"/>
+          <circle cx="25" cy="23" r="2.5" fill="rgba(200,225,245,0.5)"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Welcome to Smart Re-Mark</h2>
+        <p>GPS Waypoint Deduplicator, Cleaner &amp; Format Converter</p>
+      </div>
+    </div>
+    <div class="welcome-body">
+      <p>Load a GPX, CSV, KML or TXT file and Smart Re-Mark instantly analyses it for duplicates. Here's what you can do:</p>
+      <ul class="welcome-list">
+        <li>
+          <div class="wi" style="background:#d6eaf8">📂</div>
+          <div class="wt"><strong>Load &amp; auto-analyse</strong><span>Drop or browse a file — duplicates and conflicts are found immediately, no extra steps.</span></div>
+        </li>
+        <li>
+          <div class="wi" style="background:#fee2e2">🔁</div>
+          <div class="wt"><strong>Exact &amp; near duplicates</strong><span>Marks at identical coordinates or within your distance threshold are grouped. Pick which ones to keep.</span></div>
+        </li>
+        <li>
+          <div class="wi" style="background:var(--purple-lt)">🏷</div>
+          <div class="wt"><strong>Same name, different place</strong><span>Marks sharing a name but far apart are flagged. Rename or remove the ones you don't need.</span></div>
+        </li>
+        <li>
+          <div class="wi" style="background:#c8dff0">✏️</div>
+          <div class="wt"><strong>Edit export names</strong><span>Click any name in the table to set a custom export label — the original is always preserved.</span></div>
+        </li>
+        <li>
+          <div class="wi" style="background:var(--sand-lt)">⚙️</div>
+          <div class="wt"><strong>Export options</strong><span>Normalise to Proper Case, append today's date, choose coordinate format (DD, DDM, DMS), export as GPX, CSV or KML.</span></div>
+        </li>
+        <li>
+          <div class="wi" style="background:var(--green-lt)">✅</div>
+          <div class="wt"><strong>Clean Preview &amp; Binned</strong><span>See exactly which marks will be exported and which will be removed before you commit to anything.</span></div>
+        </li>
+        <li>
+          <div class="wi" style="background:#fde8e6">🗑</div>
+          <div class="wt"><strong>Safe removal</strong><span>When you export, any removed marks are automatically saved to a separate BinnedMarks backup file.</span></div>
+        </li>
+      </ul>
+    </div>
+    <div class="welcome-footer">
+      <button class="welcome-close-btn" id="welcomeClose">Get Started →</button>
+    </div>
+  </div>
 </div>
 
 <!-- CONFIRM MODAL -->
@@ -1345,6 +1431,17 @@ function doExport(){
     toast(`✓ ${pts.length} marks saved as ${safe}.${_expFmt}`,'g');
   }
 }
+
+// ─── WELCOME MODAL ───────────────────────────────────
+function openWelcome(){document.getElementById('welcomeModal').classList.remove('closed');}
+document.getElementById('helpBtn').addEventListener('click', openWelcome);
+document.getElementById('welcomeClose').addEventListener('click',()=>{
+  document.getElementById('welcomeModal').classList.add('closed');
+});
+document.getElementById('welcomeModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('welcomeModal'))
+    document.getElementById('welcomeModal').classList.add('closed');
+});
 
 document.getElementById('expGPX').addEventListener('click',()=>openExportModal('gpx'));
 document.getElementById('expCSV').addEventListener('click',()=>openExportModal('csv'));
