@@ -236,6 +236,16 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .help-btn:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5);}
 .help-btn title{display:none;}
 
+/* FILE CHIPS LIST */
+.file-chips-list{display:flex;flex-direction:column;gap:5px;}
+.file-chip-row{display:flex;align-items:center;gap:7px;background:var(--white);border:1px solid var(--border);border-radius:7px;padding:6px 10px;}
+.file-chip-row .fcn{font-weight:700;font-size:.75rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-chip-row .fcc{font-size:.68rem;color:var(--muted);white-space:nowrap;}
+.file-chip-row .fcx{cursor:pointer;color:var(--muted);font-size:.9rem;flex-shrink:0;line-height:1;background:none;border:none;padding:0;}
+.file-chip-row .fcx:hover{color:var(--red);}
+.btn-add-file{width:100%;background:var(--white);border:1.5px dashed var(--border2);color:var(--accent);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;border-radius:7px;padding:7px;cursor:pointer;transition:all .15s;margin-top:4px;}
+.btn-add-file:hover{border-color:var(--accent);background:var(--accent-lt);}
+
 /* VERSION */
 .version-tag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:'Source Code Pro',monospace;}
 
@@ -291,9 +301,11 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   </div>
 
   <div id="loadedSec" style="display:none">
-    <div class="sh">📄 Loaded File</div>
-    <div class="file-chip" id="fileChip"></div>
-    <button class="btn btn-outline btn-full" id="startOverBtn" style="margin-top:8px;color:var(--red);border-color:var(--red)">↺ Start Over / Load Different File</button>
+    <div class="sh">📄 Loaded Files</div>
+    <div class="file-chips-list" id="fileChipsList"></div>
+    <button class="btn-add-file" id="addFileBtn">＋ Add Another File</button>
+    <input type="file" id="fi2" accept=".gpx,.csv,.kml,.txt" style="display:none">
+    <button class="btn btn-outline btn-full" id="startOverBtn" style="margin-top:6px;color:var(--red);border-color:var(--red)">↺ Start Over</button>
   </div>
 
   <div id="settingsSec" style="display:none">
@@ -1249,21 +1261,68 @@ const dz=document.getElementById('dz'),fi=document.getElementById('fi');
 dz.addEventListener('click',()=>fi.click());
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
 dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
-fi.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);fi.value='';});
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');[...e.dataTransfer.files].forEach(f=>loadFile(f));});
+fi.addEventListener('change',e=>{[...e.target.files].forEach(f=>loadFile(f));fi.value='';});
+
+// "Add another file" button wires to a second hidden input
+const fi2=document.getElementById('fi2');
+document.getElementById('addFileBtn').addEventListener('click',()=>fi2.click());
+fi2.addEventListener('change',e=>{[...e.target.files].forEach(f=>loadFile(f));fi2.value='';});
+
+function renderFileChips(){
+  const list=document.getElementById('fileChipsList');
+  if(!list)return;
+  list.innerHTML='';
+  loadedFileMeta.forEach((fm,idx)=>{
+    const row=document.createElement('div');row.className='file-chip-row';
+    row.innerHTML=`<span class="fcn" title="${esc(fm.name)}">${esc(fm.name)}</span>
+      <span class="fcc">${fm.count} marks</span>
+      <button class="fcx" title="Remove this file" onclick="removeFileMeta(${idx})">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+function removeFileMeta(idx){
+  const fname=loadedFileMeta[idx].name;
+  loadedFileMeta.splice(idx,1);
+  WP=WP.filter(w=>w.ff!==fname);
+  renderFileChips();
+  if(!WP.length){
+    // No files left — go back to upload state
+    document.getElementById('uploadSec').style.display='block';
+    document.getElementById('loadedSec').style.display='none';
+    document.getElementById('settingsSec').style.display='none';
+    document.getElementById('statsBox').style.display='none';
+    document.getElementById('exportSec').style.display='none';
+    renderAll();badges();buildClean();
+    toast('File removed','o');
+  } else {
+    analyse();
+    toast(`Removed — ${WP.length} marks remaining`,'o');
+  }
+}
 
 function loadFile(file){
+  // Prevent loading same filename twice
+  if(loadedFileMeta.some(m=>m.name===file.name)){
+    toast(`"${file.name}" is already loaded`,'o');return;
+  }
   const r=new FileReader();
   r.onload=e=>{
     const raw=parseFile(file.name,e.target.result);
-    if(!raw.length){toast('No marks found in that file','r');return;}
-    WP=finalize(raw);selIds.clear();loadedFileMeta=[{name:file.name}];
+    if(!raw.length){toast('No marks found in '+file.name,'r');return;}
+    const fmt=(raw[0]?.sf||'dd').toUpperCase();
+    const newWP=finalize(raw);
+    // ACCUMULATE — add to existing waypoints
+    WP=[...WP,...newWP];
+    selIds.clear();
+    loadedFileMeta.push({name:file.name,count:raw.length,fmt});
     document.getElementById('uploadSec').style.display='none';
     document.getElementById('loadedSec').style.display='block';
-    const fmt=(raw[0]?.sf||'dd').toUpperCase();
-    document.getElementById('fileChip').innerHTML=`<div class="fn">${esc(file.name)}</div><div class="fc">${raw.length} marks · ${fmt} format</div>`;
+    renderFileChips();
     renderAll();badges();
-    toast(`✓ Loaded ${raw.length} marks — analysing…`,'g');
+    const total=loadedFileMeta.reduce((s,m)=>s+m.count,0);
+    toast(`✓ Added ${raw.length} marks from ${file.name} — ${total} total, analysing…`,'g');
     setTimeout(()=>analyse(),80);
   };
   r.readAsText(file);
@@ -1287,7 +1346,7 @@ document.getElementById('startOverBtn').addEventListener('click',()=>{
     document.getElementById('exportSec').style.display='none';
     ['emAll','emExact','emNear','emSame','emClean','emBinned'].forEach(id=>document.getElementById(id).style.display='block');
     ['allContent','exactContent','nearContent','sameContent','cleanContent','binnedContent'].forEach(id=>document.getElementById(id).style.display='none');
-    badges();showMap([]);setTab('all');fi.value='';
+    badges();showMap([]);setTab('all');fi.value='';fi2.value='';renderFileChips();
     toast('Cleared — load a new file','g');
   });
 });
@@ -1370,7 +1429,7 @@ function openExportModal(fmt){
   const pts=expSet();
   if(!pts.length){toast('Nothing to export','o');return;}
   const input=document.getElementById('expFileName');
-  const loaded=(loadedFileMeta[0]?.name||'smartremark').replace(/\.[^.]+$/,'');
+  const loaded=loadedFileMeta.length===1?(loadedFileMeta[0].name||'smartremark').replace(/\.[^.]+$/,''):'smartremark_merged';
   input.value=loaded;
   updateExpPreview();
   const binnedNote=document.getElementById('expBinnedNote');
@@ -1447,6 +1506,6 @@ document.getElementById('expGPX').addEventListener('click',()=>openExportModal('
 document.getElementById('expCSV').addEventListener('click',()=>openExportModal('csv'));
 document.getElementById('expKML').addEventListener('click',()=>openExportModal('kml'));
 </script>
-<div class="vtag">v1.2</div>
+<div class="vtag">v1.3</div>
 </body>
 </html>
