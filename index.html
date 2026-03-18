@@ -196,6 +196,22 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .modal-msg{font-size:.8rem;color:var(--text2);line-height:1.5;margin-bottom:18px;}
 .modal-btns{display:flex;gap:9px;justify-content:flex-end;}
 
+/* EXPORT NAME MODAL */
+.exp-modal-input {
+  width:100%; padding:9px 12px;
+  border:1.5px solid var(--border2); border-radius:7px;
+  font-family:'Nunito',sans-serif; font-size:.92rem; font-weight:600;
+  color:var(--text); background:var(--white);
+  outline:none; margin-bottom:6px; transition:border-color .15s;
+}
+.exp-modal-input:focus { border-color:var(--accent); }
+.exp-modal-hint { font-size:.7rem; color:var(--muted); margin-bottom:16px; }
+.exp-modal-binned {
+  background:var(--red-lt); border:1px solid #f5a0a0;
+  border-radius:6px; padding:8px 11px;
+  font-size:.76rem; color:var(--red); margin-bottom:16px; line-height:1.5;
+}
+
 /* TOAST */
 #toast{position:fixed;bottom:18px;right:18px;background:#1f2937;color:#fff;padding:9px 16px;border-radius:9px;font-size:.79rem;font-weight:600;z-index:9999;opacity:0;transform:translateY(7px);transition:all .24s;pointer-events:none;max-width:300px;box-shadow:0 4px 16px rgba(0,0,0,.25);}
 #toast.show{opacity:1;transform:translateY(0);}
@@ -305,7 +321,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     <div class="tab" data-tab="near">Near Duplicates <span class="tab-badge" id="bNear" style="display:none">0</span></div>
     <div class="tab" data-tab="samename">Same Name, Diff. Location <span class="tab-badge" id="bSame" style="display:none">0</span></div>
     <div class="tab" data-tab="clean">Clean Preview</div>
-    <div class="tab" data-tab="binned">Binned <span class="tab-badge" style="background:var(--red)" id="bBinned" style="display:none">0</span></div>
+    <div class="tab" data-tab="binned">Binned <span class="tab-badge" id="bBinned" style="display:none;background:var(--red)">0</span></div>
   </div>
 
   <!-- ALL MARKS -->
@@ -442,6 +458,22 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     </div>
   </div>
 </div>
+<!-- EXPORT NAME MODAL -->
+<div class="modal-bg" id="expModal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-icon">💾</div>
+    <div class="modal-title">Export Your Marks</div>
+    <div class="modal-msg" style="margin-bottom:12px">Choose a name for your file. The extension will be added automatically.</div>
+    <input type="text" class="exp-modal-input" id="expFileName" placeholder="e.g. My Fishing Marks June 2026" maxlength="80">
+    <div class="exp-modal-hint" id="expFilePreview"></div>
+    <div class="exp-modal-binned" id="expBinnedNote" style="display:none"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline btn-sm" id="expModalCancel" style="width:auto">Cancel</button>
+      <button class="btn btn-green btn-sm" id="expModalOK" style="width:auto">⬇ Download</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -808,8 +840,9 @@ function analyse(){
 
 // ─── BADGES ──────────────────────────────────────────
 function badges(){
-  const b=(id,n)=>{const el=document.getElementById(id);el.textContent=n;el.style.display=n>0?'inline-block':'none';};
+  const b=(id,n)=>{const el=document.getElementById(id);if(!el)return;el.textContent=n;el.style.display=n>0?'inline-block':'none';};
   b('bAll',WP.length);b('bExact',EG.length);b('bNear',NG.length);b('bSame',SN.length);
+  b('bBinned',BS.length);
 }
 
 // ─── COORD TABLE HEADER ROW ───────────────────────────
@@ -998,20 +1031,32 @@ function renderSameName(){
 
 // ─── SAME NAME HELPERS ───────────────────────────────
 window._WP=id=>WP.find(w=>w.id===id);
-// snToggle: live row highlight + font weight update
+// snToggle: update waypoint keepInGroup state, row highlight, and rebuild binned count
 function snToggle(id,gi,checked){
+  // Update the waypoint object so BS calculation stays in sync
+  const w=WP.find(x=>x.id===id);
+  if(w) w.keepInGroup=checked;
+  // Update row highlight
   const row=document.getElementById('snr'+id);
   if(row) row.className=checked?'rkon':'rkoff';
-  // update name cell weight
+  // Update name cell weight
   const card=document.getElementById('sn'+gi);
   if(card){const td=card.querySelector('.std-'+id);if(td)td.style.fontWeight=checked?700:400;}
+  // Rebuild binned set so counts stay live across all tabs
+  buildClean();
 }
-// snAll: check/uncheck all in group and update rows
+// snAll: check/uncheck all in group and update rows + binned
 function snAll(gi,v){
   document.querySelectorAll('.snc'+gi).forEach(cb=>{
     cb.checked=v;
-    snToggle(cb.value,gi,v);
+    const w=WP.find(x=>x.id===cb.value);
+    if(w) w.keepInGroup=v;
+    const row=document.getElementById('snr'+cb.value);
+    if(row) row.className=v?'rkon':'rkoff';
+    const card=document.getElementById('sn'+gi);
+    if(card){const td=card.querySelector('.std-'+cb.value);if(td)td.style.fontWeight=v?700:400;}
   });
+  buildClean();
 }
 // snPurge: purge the UNCHECKED marks (checked = keep)
 function snPurge(gi){
@@ -1045,7 +1090,21 @@ function setExact(id,gi){EG[gi].members.forEach(w=>{w.keepInGroup=w.id===id;w.st
 // ─── CLEAN PREVIEW ───────────────────────────────────
 function buildClean(){
   CS=WP.filter(w=>w.status==='ok'||w.status==='keep');
-  BS=WP.filter(w=>w.status==='exact_dupe'||w.status==='near_dupe');
+
+  // Binned = status-flagged dupes PLUS any same-name group members
+  // that are unchecked (snFlag=true means they're in a same-name group,
+  // keepInGroup=false means the user hasn't ticked them to keep)
+  const snUnchecked = new Set();
+  SN.forEach(g => {
+    g.members.forEach(w => {
+      if(!w.keepInGroup) snUnchecked.add(w.id);
+    });
+  });
+  BS=WP.filter(w =>
+    w.status==='exact_dupe' ||
+    w.status==='near_dupe'  ||
+    snUnchecked.has(w.id)
+  );
 
   // Clean preview
   document.getElementById('emClean').style.display=CS.length?'none':'block';
@@ -1106,7 +1165,7 @@ function loadFile(file){
   r.onload=e=>{
     const raw=parseFile(file.name,e.target.result);
     if(!raw.length){toast('No marks found in that file','r');return;}
-    WP=finalize(raw);selIds.clear();
+    WP=finalize(raw);selIds.clear();loadedFileMeta=[{name:file.name}];
     document.getElementById('uploadSec').style.display='none';
     document.getElementById('loadedSec').style.display='block';
     const fmt=(raw[0]?.sf||'dd').toUpperCase();
@@ -1128,7 +1187,7 @@ document.getElementById('thresh').addEventListener('input',function(){
 // ─── START OVER ──────────────────────────────────────
 document.getElementById('startOverBtn').addEventListener('click',()=>{
   confirm2('Start Over?','All loaded marks and changes will be lost. This cannot be undone.',()=>{
-    WP=[];EG=[];NG=[];SN=[];CS=[];BS=[];analysed=false;selIds.clear();
+    WP=[];EG=[];NG=[];SN=[];CS=[];BS=[];loadedFileMeta=[];analysed=false;selIds.clear();
     document.getElementById('uploadSec').style.display='block';
     document.getElementById('loadedSec').style.display='none';
     document.getElementById('settingsSec').style.display='none';
@@ -1196,10 +1255,11 @@ function exportCoord(w,isLat,fmt){
   return Math.abs(v).toFixed(8)+' '+h;
 }
 
+// ─── BINNED AUTO-EXPORT (used by Keep Selected / Delete actions) ─────
 function exportBinned(pts){
   if(!pts.length)return;
   const now=new Date(),p=x=>String(x).padStart(2,'0');
-  const fn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}.gpx`;
+  const fn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}.gpx`;
   dl(fn,buildGPX(pts,'Smart Re-Mark BinnedMarks','source'),'application/gpx+xml');
   toast(`📦 ${pts.length} binned → ${fn}`,'o');
 }
@@ -1209,24 +1269,78 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function dl(name,content,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:mime}));a.download=name;a.click();}
 function expSet(){return analysed?CS:WP;}
 
-document.getElementById('expGPX').addEventListener('click',()=>{
-  const pts=expSet(),fmt=document.getElementById('expFmt').value;
-  dl('smartremark_clean.gpx',buildGPX(pts,'Smart Re-Mark',fmt),'application/gpx+xml');
-  toast(`✓ Exported ${pts.length} marks as GPX`,'g');
+// ─── EXPORT MODAL ─────────────────────────────────────
+let _expFmt='gpx';
+let loadedFileMeta=[];
+
+function openExportModal(fmt){
+  _expFmt=fmt;
+  const pts=expSet();
+  if(!pts.length){toast('Nothing to export','o');return;}
+  const input=document.getElementById('expFileName');
+  const loaded=(loadedFileMeta[0]?.name||'smartremark').replace(/\.[^.]+$/,'');
+  input.value=loaded;
+  updateExpPreview();
+  const binnedNote=document.getElementById('expBinnedNote');
+  const binned=BS.length;
+  if(binned>0){
+    const now=new Date(),p=x=>String(x).padStart(2,'0');
+    const bfn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}.gpx`;
+    binnedNote.style.display='block';
+    binnedNote.innerHTML=`🗑 <strong>${binned} binned mark${binned>1?'s':''}</strong> will also be automatically saved as <strong>${bfn}</strong>`;
+  } else {
+    binnedNote.style.display='none';
+  }
+  document.getElementById('expModal').classList.add('open');
+  input.focus(); input.select();
+}
+
+function updateExpPreview(){
+  const raw=document.getElementById('expFileName').value.trim()||'my-marks';
+  const safe=raw.replace(/[\/\\:*?"<>|]/g,'_');
+  document.getElementById('expFilePreview').textContent=`File will be saved as: ${safe}.${_expFmt}`;
+}
+
+document.getElementById('expFileName').addEventListener('input',updateExpPreview);
+document.getElementById('expFileName').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();doExport();}
+  if(e.key==='Escape'){e.preventDefault();document.getElementById('expModal').classList.remove('open');}
 });
-document.getElementById('expCSV').addEventListener('click',()=>{
-  const pts=expSet(),fmt=document.getElementById('expFmt').value;
-  const hdr='name,lat_src,lon_src,lat_dd,lon_dd,datetime';
-  const rows=pts.map(w=>`"${label(w).replace(/"/g,'""')}","${exportCoord(w,true,fmt)}","${exportCoord(w,false,fmt)}",${w.lat.toFixed(8)},${w.lon.toFixed(8)},${w.dt?w.dt.toISOString():''}`);
-  dl('smartremark_clean.csv',[hdr,...rows].join('\n'),'text/csv');
-  toast(`✓ Exported ${pts.length} marks as CSV`,'g');
-});
-document.getElementById('expKML').addEventListener('click',()=>{
-  const pts=expSet(),fmt=document.getElementById('expFmt').value;
-  const pm=pts.map(w=>`  <Placemark>\n    <name>${eX(label(w))}</name>\n    <description>${eX(exportCoord(w,true,fmt)+', '+exportCoord(w,false,fmt))}</description>\n    <Point><coordinates>${w.lon.toFixed(8)},${w.lat.toFixed(8)},0</coordinates></Point>\n  </Placemark>`);
-  dl('smartremark_clean.kml',`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>\n<name>Smart Re-Mark Export</name>\n${pm.join('\n')}\n</Document></kml>`,'application/vnd.google-earth.kml+xml');
-  toast(`✓ Exported ${pts.length} marks as KML`,'g');
-});
+document.getElementById('expModalCancel').addEventListener('click',()=>document.getElementById('expModal').classList.remove('open'));
+document.getElementById('expModalOK').addEventListener('click',doExport);
+document.getElementById('expModal').addEventListener('click',e=>{if(e.target===document.getElementById('expModal'))document.getElementById('expModal').classList.remove('open');});
+
+function doExport(){
+  const raw=document.getElementById('expFileName').value.trim()||'my-marks';
+  const safe=raw.replace(/[\/\\:*?"<>|]/g,'_');
+  const fmt=document.getElementById('expFmt').value;
+  const pts=expSet();
+  document.getElementById('expModal').classList.remove('open');
+
+  if(_expFmt==='gpx'){
+    dl(safe+'.gpx',buildGPX(pts,'Smart Re-Mark',fmt),'application/gpx+xml');
+  } else if(_expFmt==='csv'){
+    const hdr='name,lat_src,lon_src,lat_dd,lon_dd';
+    const rows=pts.map(w=>`"${label(w).replace(/"/g,'""')}","${exportCoord(w,true,fmt)}","${exportCoord(w,false,fmt)}",${w.lat.toFixed(8)},${w.lon.toFixed(8)}`);
+    dl(safe+'.csv',[hdr,...rows].join('\n'),'text/csv');
+  } else if(_expFmt==='kml'){
+    const pm=pts.map(w=>`  <Placemark>\n    <n>${eX(label(w))}</n>\n    <description>${eX(exportCoord(w,true,fmt)+', '+exportCoord(w,false,fmt))}</description>\n    <Point><coordinates>${w.lon.toFixed(8)},${w.lat.toFixed(8)},0</coordinates></Point>\n  </Placemark>`);
+    dl(safe+'.kml',`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>\n<n>${eX(raw)}</n>\n${pm.join('\n')}\n</Document></kml>`,'application/vnd.google-earth.kml+xml');
+  }
+
+  if(BS.length){
+    const now=new Date(),p=x=>String(x).padStart(2,'0');
+    const bfn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}.gpx`;
+    setTimeout(()=>{
+      dl(bfn,buildGPX(BS,'Smart Re-Mark BinnedMarks','source'),'application/gpx+xml');
+      toast(`✓ ${pts.length} marks → ${safe}.${_expFmt}   ·   ${BS.length} binned → ${bfn}`,'g');
+    },300);
+  } else {
+    toast(`✓ ${pts.length} marks saved as ${safe}.${_expFmt}`,'g');
+  }
+}
+
+document.getElementById('expGPX').addEventListener('click',()=>openExportModal('gpx'));
+document.getElementById('expCSV').addEventListener('click',()=>openExportModal('csv'));
+document.getElementById('expKML').addEventListener('click',()=>openExportModal('kml'));
 </script>
-</body>
-</html>
