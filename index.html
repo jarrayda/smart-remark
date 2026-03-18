@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Re-Mark</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Source+Code+Pro:wght@400;600&display=swap');
+:root {
+  /* Ocean + sandy palette */
+  --bg:#cfd9e6;              /* blue-grey page wash */
+  --white:#eef3f9;           /* cool near-white panels */
+  --card:#dde6f0;            /* slightly deeper cards */
+  --border:#a8bdd4;
+  --border2:#8aabc7;
+  --accent:#1a5f8a;          /* ocean blue */
+  --accent-lt:#c8dff0;
+  --green:#1a7a52; --green-lt:#c8ead9;
+  --orange:#b87333; --orange-lt:#f0dfc0;  /* sandy copper */
+  --red:#b52b2b; --red-lt:#f5d0cc;
+  --purple:#5a4a96; --purple-lt:#ddd8f5;
+  --sand:#c4963a;            /* warm sandy yellow */
+  --sand-lt:#f5e8c8;
+  --header-bg:#0d3b5e;       /* deep ocean header */
+  --text:#12293d; --text2:#2e5068; --muted:#6a8ea8;
+  --shadow:0 1px 4px rgba(13,59,94,0.12),0 4px 14px rgba(13,59,94,0.09);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;min-height:100vh;}
+
+/* HEADER */
+header{background:var(--header-bg);border-bottom:none;padding:13px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(13,59,94,0.35);position:relative;z-index:20;}
+.logo{width:44px;height:44px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.22);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+header h1{font-size:1.35rem;font-weight:800;line-height:1;color:#fff;}
+header h1 span{color:var(--sand);}
+header p{font-size:0.72rem;color:rgba(200,220,240,0.7);margin-top:2px;}
+
+/* LAYOUT */
+.shell{display:grid;grid-template-columns:270px 1fr 360px;height:calc(100vh - 67px);overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{background:#d0dce8;border-right:1px solid var(--border);padding:16px 14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+.sh{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+
+/* DROP ZONE */
+.drop-zone{border:2px dashed var(--border2);border-radius:10px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .18s;background:var(--card);}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:var(--accent-lt);}
+.drop-zone svg{display:block;margin:0 auto 7px;color:var(--accent);}
+.drop-zone p{font-size:0.78rem;color:var(--text2);line-height:1.5;}
+.drop-zone strong{color:var(--accent);}
+#fi{display:none;}
+
+/* LOADED CHIP */
+.file-chip{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 11px;}
+.file-chip .fn{font-weight:700;font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.file-chip .fc{font-size:0.72rem;color:var(--muted);margin-top:3px;}
+
+/* BUTTONS */
+.btn{padding:8px 14px;border:none;border-radius:7px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.btn-primary{background:var(--accent);color:#fff;width:100%;}
+.btn-primary:hover{background:#1557b0;}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+.btn-outline{background:var(--white);border:1.5px solid var(--border2);color:var(--text2);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt);}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover{background:#b91c1c;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:#166346;}
+.btn-sm{padding:5px 10px;font-size:0.71rem;border-radius:6px;}
+.btn-full{width:100%;}
+
+/* RANGE */
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
+.thresh-row{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
+.thresh-val{background:var(--accent);color:#fff;font-weight:700;font-size:0.78rem;padding:2px 9px;border-radius:20px;font-family:'Source Code Pro',monospace;}
+.thresh-hint{font-size:0.67rem;color:var(--muted);}
+
+/* STATS */
+.stats-box{display:none;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:0.78rem;}
+.stat-row+.stat-row{border-top:1px solid var(--border);}
+.stat-label{color:var(--text2);}
+.stat-val{font-weight:700;font-family:'Source Code Pro',monospace;font-size:0.8rem;}
+.sv-blue{color:var(--accent);}.sv-red{color:var(--red);}.sv-orange{color:var(--orange);}.sv-green{color:var(--green);}.sv-purple{color:var(--purple);}
+.pbar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:7px;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--accent),#5b9bef);border-radius:3px;transition:width .4s;}
+.plabel{font-size:0.65rem;color:var(--muted);text-align:right;margin-top:2px;}
+
+/* EXPORT */
+.export-section{display:none;}
+.opt-check{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:7px;margin-bottom:8px;}
+.opt-check input{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.opt-check label{font-size:0.76rem;font-weight:700;color:var(--text2);cursor:pointer;display:block;}
+.opt-check span{font-size:0.64rem;color:var(--muted);}
+.fmt-row{display:flex;gap:6px;align-items:center;margin-bottom:8px;}
+.fmt-row label{font-size:0.76rem;font-weight:700;color:var(--text2);white-space:nowrap;}
+.fmt-select{flex:1;background:var(--card);border:1.5px solid var(--border2);color:var(--text);padding:5px 8px;border-radius:6px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:600;outline:none;cursor:pointer;}
+.fmt-select:focus{border-color:var(--accent);}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+/* MAIN CONTENT */
+.content{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);padding:0 12px;overflow-x:auto;flex-shrink:0;}
+.tab{padding:12px 15px;font-size:0.77rem;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;transition:all .15s;user-select:none;white-space:nowrap;flex-shrink:0;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--header-bg);border-bottom-color:var(--sand);border-bottom-width:3px;}
+.tab-badge{display:inline-block;background:var(--red);color:#fff;border-radius:10px;padding:1px 5px;font-size:0.6rem;margin-left:3px;vertical-align:middle;font-weight:700;}
+.panel{display:none;flex:1;padding:14px;overflow-y:auto;}
+.panel.active{display:block;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty .ico{width:54px;height:54px;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.empty h3{font-size:.92rem;color:var(--text2);margin-bottom:4px;}
+.empty p{font-size:.78rem;max-width:260px;margin:0 auto;}
+
+/* TABLE */
+.tcard{background:var(--white);border-radius:9px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.bulk{display:flex;gap:6px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--card);flex-wrap:wrap;}
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--card);}
+th{padding:8px 10px;text-align:left;font-size:0.67rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+th small{font-size:.58rem;font-weight:500;color:var(--muted);letter-spacing:0;text-transform:none;}
+th br+small,th br+span{display:inline-block;margin-top:1px;}
+td{padding:7px 10px;border-bottom:1px solid #f3f4f6;font-size:.77rem;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tr.rn{cursor:pointer;}tr.rn:hover td{background:#f8faff;}
+tr.rd td{background:#fff5f5;cursor:pointer;}tr.rd:hover td{background:#fee2e2;}
+tr.rk td{background:#f0faf6;cursor:pointer;}tr.rk:hover td{background:#d1fae5;}
+tr.rs td{background:#eff6ff!important;outline:2px solid #93c5fd;outline-offset:-2px;}
+tr.rkon td{background:var(--green-lt);}tr.rkon:hover td{background:#bbf7d0;}
+tr.rkoff td{background:var(--red-lt);}tr.rkoff:hover td{background:#fecaca;}
+.mono{font-family:'Source Code Pro',monospace;font-size:.7rem;}
+td.csrc{background:rgba(26,115,232,.05);border-left:2px solid rgba(26,115,232,.2);}
+th.csrc{background:rgba(26,115,232,.06);border-left:2px solid rgba(26,115,232,.25);color:var(--accent);}
+td.calt{color:var(--muted);}th.calt{color:var(--muted);}
+.spill{display:inline-block;background:var(--accent-lt);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.57rem;font-weight:700;text-transform:uppercase;vertical-align:middle;}
+input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.62rem;font-weight:700;text-transform:uppercase;}
+.bok{background:var(--green-lt);color:var(--green);}
+.bex{background:var(--red-lt);color:var(--red);}
+.bnd{background:var(--orange-lt);color:var(--orange);}
+.bkp{background:var(--accent-lt);color:var(--accent);}
+
+/* GROUP CARDS */
+.glist{display:flex;flex-direction:column;gap:11px;}
+.gcard{background:var(--white);border:1px solid var(--border);border-radius:9px;overflow:hidden;box-shadow:var(--shadow);}
+.ghdr{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--card);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+.ghdr:hover{background:#eef0f3;}
+.gnum{color:#fff;width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;flex-shrink:0;}
+.gtitle{font-weight:700;font-size:.82rem;flex:1;}
+.gmeta{font-size:.69rem;color:var(--text2);}
+.caret{transition:transform .2s;color:var(--muted);flex-shrink:0;}
+.collapsed .caret{transform:rotate(-90deg);}
+.collapsed .gbody{display:none;}
+.gbody{padding:11px 13px;}
+.ghint{font-size:.73rem;color:var(--text2);margin-bottom:9px;line-height:1.5;background:var(--card);border-radius:5px;padding:7px 10px;border-left:3px solid var(--accent);}
+.klabel{display:flex;align-items:center;gap:5px;font-size:.74rem;color:var(--text);cursor:pointer;}
+.klabel input{accent-color:var(--green);cursor:pointer;width:14px;height:14px;flex-shrink:0;}
+.gacts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+
+/* EDITABLE NAME */
+.ename{font-weight:600;cursor:text;border-bottom:1px dashed transparent;transition:border-color .15s;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
+.ename:hover{border-bottom-color:var(--accent);}
+.einput{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:600;border:1.5px solid var(--accent);border-radius:4px;padding:2px 5px;outline:none;width:100%;min-width:80px;display:block;background:#fff;color:var(--text);}
+
+/* MAP PANEL */
+.mapp{background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.mhdr{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;background:var(--card);flex-shrink:0;}
+.mdot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s;}
+.mdot.on{background:var(--green);}
+.mhtxt{font-weight:700;font-size:.8rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mhsub{font-size:.68rem;color:var(--muted);}
+.mhold{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#d4e6f1;color:var(--muted);font-size:.8rem;text-align:center;padding:20px;}
+.mhold svg{opacity:.35;}
+.mhold.gone{display:none;}
+#mapIframe{display:none;flex:1;width:100%;min-height:0;}
+.map-open-btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none;margin-top:6px;transition:background .15s;}
+.map-open-btn:hover{background:var(--header-bg);}
+.mcoords{padding:9px 13px;max-height:140px;overflow-y:auto;border-top:1px solid var(--border);flex-shrink:0;background:var(--card);}
+.mcrow{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--border);font-size:.71rem;gap:8px;}
+.mcrow:last-child{border-bottom:none;}
+.mcname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.mcdms{font-family:'Source Code Pro',monospace;font-size:.64rem;color:var(--text2);text-align:right;flex-shrink:0;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal-box{background:#fff;border-radius:13px;padding:26px 26px 20px;max-width:340px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.22);transform:scale(.95);transition:transform .2s;}
+.modal-bg.open .modal-box{transform:scale(1);}
+.modal-icon{font-size:1.9rem;margin-bottom:9px;}
+.modal-title{font-size:.98rem;font-weight:800;color:var(--text);margin-bottom:5px;}
+.modal-msg{font-size:.8rem;color:var(--text2);line-height:1.5;margin-bottom:18px;}
+.modal-btns{display:flex;gap:9px;justify-content:flex-end;}
+
+/* TOAST */
+#toast{position:fixed;bottom:18px;right:18px;background:#1f2937;color:#fff;padding:9px 16px;border-radius:9px;font-size:.79rem;font-weight:600;z-index:9999;opacity:0;transform:translateY(7px);transition:all .24s;pointer-events:none;max-width:300px;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.tg{background:#065f46;}#toast.to{background:#92400e;}#toast.tr{background:#991b1b;}
+
+@media(max-width:1100px){.shell{grid-template-columns:255px 1fr;grid-template-rows:1fr auto;}.mapp{grid-column:1/-1;height:280px;border-top:1px solid var(--border);border-left:none;}}
+@media(max-width:700px){.shell{grid-template-columns:1fr;height:auto;overflow:auto;}.mapp{height:250px;}header{padding:10px 14px;}header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <!-- Clustered pins: multiple marks close together = the problem this solves -->
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+      <!-- left small pin -->
+      <path d="M10 6c-2.2 0-4 1.8-4 4 0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" fill="rgba(200,225,245,0.55)"/>
+      <circle cx="10" cy="10" r="1.6" fill="rgba(255,255,255,0.8)"/>
+      <!-- right small pin -->
+      <path d="M28 6c-2.2 0-4 1.8-4 4 0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" fill="rgba(200,225,245,0.55)"/>
+      <circle cx="28" cy="10" r="1.6" fill="rgba(255,255,255,0.8)"/>
+      <!-- centre tall pin — the "kept" mark, brighter + larger -->
+      <path d="M19 3c-3 0-5.5 2.5-5.5 5.5 0 4 5.5 10.5 5.5 10.5S24.5 12.5 24.5 8.5C24.5 5.5 22 3 19 3z" fill="white"/>
+      <circle cx="19" cy="8.5" r="2.2" fill="#c4963a"/>
+      <!-- small dots below = more clustered marks in background -->
+      <circle cx="13" cy="23" r="2.5" fill="rgba(200,225,245,0.5)"/>
+      <circle cx="19" cy="25" r="2.5" fill="rgba(200,225,245,0.6)"/>
+      <circle cx="25" cy="23" r="2.5" fill="rgba(200,225,245,0.5)"/>
+    </svg>
+  </div>
+  <div>
+    <h1>Smart <span>Re-Mark</span></h1>
+    <p>GPS Waypoint Deduplicator, Cleaner &amp; Format Converter</p>
+  </div>
+</header>
+
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div id="uploadSec">
+    <div class="sh">📂 Load Your Marks</div>
+    <div class="drop-zone" id="dz">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p>Drop <strong>GPX, CSV, KML, TXT</strong><br>or <strong>click to browse</strong></p>
+    </div>
+    <input type="file" id="fi" accept=".gpx,.csv,.kml,.txt">
+  </div>
+
+  <div id="loadedSec" style="display:none">
+    <div class="sh">📄 Loaded File</div>
+    <div class="file-chip" id="fileChip"></div>
+    <button class="btn btn-outline btn-full" id="startOverBtn" style="margin-top:8px;color:var(--red);border-color:var(--red)">↺ Start Over / Load Different File</button>
+  </div>
+
+  <div id="settingsSec" style="display:none">
+    <div class="sh">⚙️ Near-Duplicate Distance</div>
+    <input type="range" id="thresh" min="1" max="500" value="50" step="1">
+    <div class="thresh-row">
+      <span class="thresh-hint">Marks closer than this = near-duplicate</span>
+      <span class="thresh-val"><span id="threshVal">50</span>m</span>
+    </div>
+  </div>
+
+  <div class="stats-box" id="statsBox">
+    <div class="sh" style="margin-bottom:5px">📊 Results</div>
+    <div class="stat-row"><span class="stat-label">Total loaded</span><span class="stat-val sv-blue" id="sTotal">0</span></div>
+    <div class="stat-row"><span class="stat-label">Exact duplicates</span><span class="stat-val sv-red" id="sExact">0</span></div>
+    <div class="stat-row"><span class="stat-label">Near-duplicates</span><span class="stat-val sv-orange" id="sNear">0</span></div>
+    <div class="stat-row"><span class="stat-label">Same name conflicts</span><span class="stat-val sv-purple" id="sSame">0</span></div>
+    <div class="stat-row"><span class="stat-label">Unique marks</span><span class="stat-val sv-green" id="sUniq">0</span></div>
+    <div class="stat-row"><span class="stat-label">Will be binned</span><span class="stat-val sv-red" id="sBinned">0</span></div>
+    <div class="pbar"><div class="pfill" id="pbar" style="width:0%"></div></div>
+    <div class="plabel" id="plabel"></div>
+  </div>
+
+  <div class="export-section" id="exportSec">
+    <div class="sh">💾 Export</div>
+    <div class="opt-check">
+      <input type="checkbox" id="cbNorm" onchange="buildClean()">
+      <div><label for="cbNorm">Normalise mark names</label><span>Converts to Proper Case on export</span></div>
+    </div>
+    <div class="opt-check">
+      <input type="checkbox" id="cbDate" onchange="buildClean()">
+      <div><label for="cbDate">Append date to mark names</label><span>e.g. Spot 1 - Valid 18/03/2026</span></div>
+    </div>
+    <div class="fmt-row">
+      <label>Coordinate format:</label>
+      <select class="fmt-select" id="expFmt">
+        <option value="source">Same as source</option>
+        <option value="dd">Decimal Degrees (DD)</option>
+        <option value="ddm">Deg. Decimal Min. (DDM)</option>
+        <option value="dms">Deg. Min. Sec. (DMS)</option>
+      </select>
+    </div>
+    <div class="exp-grid">
+      <button class="btn btn-green btn-sm" id="expGPX">GPX</button>
+      <button class="btn btn-outline btn-sm" id="expCSV">CSV</button>
+      <button class="btn btn-outline btn-sm" id="expKML">KML</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="content">
+  <div class="tabs">
+    <div class="tab active" data-tab="all">All Marks <span class="tab-badge" id="bAll" style="display:none">0</span></div>
+    <div class="tab" data-tab="exact">Exact Duplicates <span class="tab-badge" id="bExact" style="display:none">0</span></div>
+    <div class="tab" data-tab="near">Near Duplicates <span class="tab-badge" id="bNear" style="display:none">0</span></div>
+    <div class="tab" data-tab="samename">Same Name, Diff. Location <span class="tab-badge" id="bSame" style="display:none">0</span></div>
+    <div class="tab" data-tab="clean">Clean Preview</div>
+    <div class="tab" data-tab="binned">Binned <span class="tab-badge" style="background:var(--red)" id="bBinned" style="display:none">0</span></div>
+  </div>
+
+  <!-- ALL MARKS -->
+  <div class="panel active" id="tab-all">
+    <div class="empty" id="emAll"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 14 8 14s8-8.75 8-14c0-4.42-3.58-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg></div><h3>No marks loaded</h3><p>Drop a GPX, CSV, KML or TXT file in the sidebar</p></div>
+    <div id="allContent" style="display:none">
+      <div class="tcard">
+        <div class="bulk">
+          <button class="btn btn-outline btn-sm" id="selAll">All</button>
+          <button class="btn btn-outline btn-sm" id="selNone">None</button>
+          <button class="btn btn-outline btn-sm" id="selFlag">Flagged</button>
+          <button class="btn btn-red btn-sm" id="delSel" style="margin-left:auto">🗑 Delete Selected</button>
+        </div>
+        <div class="twrap"><table>
+          <thead><tr>
+            <th style="width:28px"><input type="checkbox" id="mCheck"></th>
+            <th>#</th><th>Name</th>
+            <th>Export Name <small>(click to edit)</small></th>
+            <th id="th1" class="csrc">Latitude<br><span class="spill">Source</span></th>
+            <th id="th2" class="csrc">Longitude<br><span class="spill">Source</span></th>
+            <th id="th3" class="calt">Latitude<br><small>(alt)</small></th>
+            <th id="th4" class="calt">Longitude<br><small>(alt)</small></th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="allBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXACT DUPES -->
+  <div class="panel" id="tab-exact">
+    <div class="empty" id="emExact"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div><h3>No exact duplicates</h3><p>Marks at identical coordinates will appear here</p></div>
+    <div id="exactContent" style="display:none">
+      <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <p style="font-size:.8rem;color:var(--text2)">Same coordinates — pick one to keep per group.</p>
+        <button class="btn btn-red btn-sm" id="purgeExact">✓ Keep Selected</button>
+      </div>
+      <div class="glist" id="exactList"></div>
+    </div>
+  </div>
+
+  <!-- NEAR DUPES -->
+  <div class="panel" id="tab-near">
+    <div class="empty" id="emNear"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div><h3>No near-duplicates</h3><p>Marks within your distance threshold will appear here</p></div>
+    <div id="nearContent" style="display:none">
+      <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <p style="font-size:.8rem;color:var(--text2)">Within <strong id="thDisp">50m</strong> of each other. Tick the ones to keep.</p>
+        <button class="btn btn-red btn-sm" id="purgeNear">✓ Keep Selected</button>
+      </div>
+      <div class="glist" id="nearList"></div>
+    </div>
+  </div>
+
+  <!-- SAME NAME -->
+  <div class="panel" id="tab-samename">
+    <div class="empty" id="emSame"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><h3>No same-name conflicts</h3><p>Marks sharing a name but located further apart than your threshold will appear here</p></div>
+    <div id="sameContent" style="display:none">
+      <div style="margin-bottom:10px">
+        <p style="font-size:.8rem;color:var(--text2)">Same name, different physical location (more than <strong id="snDisp">50m</strong> apart). Rename or remove as needed.</p>
+      </div>
+      <div class="glist" id="sameList"></div>
+    </div>
+  </div>
+
+  <!-- CLEAN PREVIEW -->
+  <div class="panel" id="tab-clean">
+    <div class="empty" id="emClean"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Nothing to preview</h3><p>Analysis results will appear here after loading a file</p></div>
+    <div id="cleanContent" style="display:none">
+      <div class="tcard"><div class="twrap"><table>
+        <thead><tr>
+          <th>#</th><th>Export Name</th>
+          <th class="csrc">Latitude<br><span class="spill">Source</span></th>
+          <th class="csrc">Longitude<br><span class="spill">Source</span></th>
+          <th class="calt">Latitude<br><small>(alt)</small></th>
+          <th class="calt">Longitude<br><small>(alt)</small></th>
+          
+        </tr></thead>
+        <tbody id="cleanBody"></tbody>
+      </table></div></div>
+    </div>
+  </div>
+  <!-- BINNED -->
+  <div class="panel" id="tab-binned">
+    <div class="empty" id="emBinned"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></div><h3>No binned marks yet</h3><p>Marks you choose to remove will appear here — nothing is lost until you export</p></div>
+    <div id="binnedContent" style="display:none">
+      <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <p style="font-size:.8rem;color:var(--text2)">These marks are <strong>flagged for removal</strong> based on your current keep/purge decisions. They won't appear in your export. Go back to any tab to rescue a mark by ticking it to keep.</p>
+        <span style="font-size:.78rem;color:var(--muted)" id="binnedCount"></span>
+      </div>
+      <div class="tcard"><div class="twrap"><table>
+        <thead><tr>
+          <th>#</th><th>Name</th><th>Reason</th>
+          <th class="csrc">Latitude<br><span class="spill">Source</span></th>
+          <th class="csrc">Longitude<br><span class="spill">Source</span></th>
+          <th class="calt">Latitude<br><small>(alt)</small></th>
+          <th class="calt">Longitude<br><small>(alt)</small></th>
+        </tr></thead>
+        <tbody id="binnedBody"></tbody>
+      </table></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- MAP -->
+<div class="mapp">
+  <div class="mhdr">
+    <div class="mdot" id="mdot"></div>
+    <div>
+      <div class="mhtxt" id="mhtxt">Select a mark to see its location</div>
+      <div class="mhsub" id="mhsub">Click any row in the table</div>
+    </div>
+  </div>
+  <div class="mhold" id="mhold">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <p style="font-weight:700;color:var(--text2);margin:0">Click any mark to preview</p>
+    <p style="font-size:.72rem;color:var(--muted);margin:0">Shows location + opens in Google Maps</p>
+  </div>
+  <iframe id="mapIframe" style="display:none;flex:1;border:none;width:100%;min-height:0;" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <div id="mapLinks" style="display:none;padding:8px 10px;border-top:1px solid var(--border);background:var(--card);flex-shrink:0;text-align:center;"></div>
+  <div class="mcoords" id="mcoords" style="display:none"></div>
+</div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title" id="modalTitle">Are you sure?</div>
+    <div class="modal-msg" id="modalMsg"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline btn-sm" id="modalNo" style="width:auto">Cancel</button>
+      <button class="btn btn-red btn-sm" id="modalYes" style="width:auto">Yes, continue</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────
+let WP=[],EG=[],NG=[],SN=[],CS=[],BS=[]; // waypoints, exactGroups, nearGroups, sameNameGroups, cleanSet, binnedSet
+let analysed=false, selIds=new Set();
+
+// ─── TOAST ───────────────────────────────────────────
+function toast(m,t){const el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' t'+t:'');clearTimeout(el._t);el._t=setTimeout(()=>el.className='',3400);}
+
+// ─── CONFIRM MODAL ───────────────────────────────────
+function confirm2(title,msg,onYes){
+  const bg=document.getElementById('modal');
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalMsg').textContent=msg;
+  bg.classList.add('open');
+  const yes=document.getElementById('modalYes'),no=document.getElementById('modalNo');
+  function done(){bg.classList.remove('open');yes.onclick=null;no.onclick=null;bg.onclick=null;}
+  yes.onclick=()=>{done();onYes();};
+  no.onclick=done;
+  bg.onclick=e=>{if(e.target===bg)done();};
+}
+
+// ─── TABS ─────────────────────────────────────────────
+function setTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='tab-'+t));
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.tab)));
+
+// ─── MAP ─────────────────────────────────────────────
+// Canvas-based mini-map: plots dots on a styled ocean background.
+// "Open in Google Maps" button provides the real map view.
+// No external scripts needed — works in any sandbox.
+let mapTimer=null, lmap=null, lmarkers=[];  // lmap/lmarkers kept for compat
+
+function showMap(pts){clearTimeout(mapTimer);mapTimer=setTimeout(()=>_showMap(pts),80);}
+
+function _showMap(pts){
+  const hold   = document.getElementById('mhold');
+  const iframe = document.getElementById('mapIframe');
+  const htxt   = document.getElementById('mhtxt');
+  const hsub   = document.getElementById('mhsub');
+  const dot    = document.getElementById('mdot');
+  const coords = document.getElementById('mcoords');
+  const links  = document.getElementById('mapLinks');
+
+  if(!pts||!pts.length){
+    hold.classList.remove('gone'); iframe.style.display='none';
+    links.style.display='none'; coords.style.display='none';
+    htxt.textContent='Select a mark to see its location';
+    hsub.textContent='Click any row in the table';
+    dot.className='mdot'; return;
+  }
+
+  hold.classList.add('gone');
+  dot.className='mdot on';
+  iframe.style.display='block';
+
+  // zoom=11 ≈ ~20km view radius, centred on the mark
+  // t=h gives hybrid satellite view (satellite imagery + labels)
+  // Google Maps embed: &t=h = hybrid (satellite+labels), z=11 ≈ 20km wide
+  if(pts.length===1){
+    const p = pts[0];
+    htxt.textContent = p.name;
+    hsub.textContent = ddm(p.lat,true)+'   '+ddm(p.lon,false);
+
+    // Google Maps embed with satellite/hybrid tile, red marker pin, zoom 11 (~20km)
+    iframe.src = `https://maps.google.com/maps?q=${p.lat.toFixed(6)},${p.lon.toFixed(6)}&z=11&t=h&output=embed`;
+
+    links.style.display='block';
+    const gmUrl=`https://www.google.com/maps/search/?api=1&query=${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
+    links.innerHTML=`<a href="${gmUrl}" target="_blank" rel="noopener" class="map-open-btn">🗺 Open in Google Maps ↗</a>`;
+  } else {
+    // Multiple marks: fit bbox, zoom out appropriately
+    const lats=pts.map(p=>p.lat), lons=pts.map(p=>p.lon);
+    const cLat=((Math.min(...lats)+Math.max(...lats))/2).toFixed(6);
+    const cLon=((Math.min(...lons)+Math.max(...lons))/2).toFixed(6);
+    htxt.textContent = pts.length+' marks';
+    hsub.textContent = 'Click a row for individual detail';
+
+    iframe.src = `https://maps.google.com/maps?q=${cLat},${cLon}&z=11&t=h&output=embed`;
+
+    links.style.display='block';
+    const gmUrl=`https://www.google.com/maps/search/?api=1&query=${cLat},${cLon}`;
+    links.innerHTML=`<a href="${gmUrl}" target="_blank" rel="noopener" class="map-open-btn">🗺 Open in Google Maps ↗</a>`;
+  }
+
+  // Coords list
+  coords.style.display='block';
+  coords.innerHTML=pts.map(p=>`<div class="mcrow"><span class="mcname">${esc(p.name)}</span><span class="mcdms">${dms(p.lat,true)}<br>${dms(p.lon,false)}</span></div>`).join('');
+}
+
+// ─── COORD FORMATTERS ────────────────────────────────
+function dms(v,isLat){
+  const h=isLat?(v>=0?'N':'S'):(v>=0?'E':'W');
+  const a=Math.abs(v),d=Math.floor(a),mf=(a-d)*60,m=Math.floor(mf),s=((mf-m)*60).toFixed(2);
+  return d+'° '+String(m).padStart(2,'0')+"' "+s.padStart(5,'0')+'" '+h;
+}
+function ddm(v,isLat){
+  const h=isLat?(v>=0?'N':'S'):(v>=0?'E':'W');
+  const a=Math.abs(v),d=Math.floor(a),m=((a-d)*60).toFixed(4);
+  return d+'° '+m+"' "+h;
+}
+function dd(v){return v.toFixed(6);}
+
+function getCoordLabels(){
+  if(!WP.length)return{sl:'DD',al:'DMS'};
+  const fc={};
+  WP.forEach(w=>{const f=w.sf||'dd';fc[f]=(fc[f]||0)+1;});
+  const dom=Object.entries(fc).sort((a,b)=>b[1]-a[1])[0]?.[0]||'dd';
+  const srcDD=(dom==='dd'||dom==='csv'||dom==='txt'||dom==='gpx'||dom==='kml');
+  return{sl:srcDD?'DD':dom==='ddm'?'DDM':'DMS', al:srcDD?'DMS':'DD'};
+}
+
+function coordCells(w){
+  const f=w.sf||'dd';
+  const srcDD=(f==='dd'||f==='csv'||f==='txt'||f==='gpx'||f==='kml');
+  if(srcDD) return{ls:dd(w.lat),lns:dd(w.lon),la:dms(w.lat,true),lna:dms(w.lon,false)};
+  if(f==='ddm') return{ls:ddm(w.lat,true),lns:ddm(w.lon,false),la:dd(w.lat),lna:dd(w.lon)};
+  return{ls:dms(w.lat,true),lns:dms(w.lon,false),la:dd(w.lat),lna:dd(w.lon)};
+}
+
+function updateColHeaders(){
+  const {sl,al}=getCoordLabels();
+  const t=document.getElementById;
+  ['th1','th2','th3','th4'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(!el)return;
+    const word=i<2?'Latitude':'Longitude';
+    if(i<2) el.innerHTML=word+'<br><span class="spill">Source · '+sl+'</span>';
+    else el.innerHTML=word+'<br><small>('+al+')</small>';
+  });
+}
+
+// ─── EXPORT LABEL ────────────────────────────────────
+function label(w){
+  const norm=document.getElementById('cbNorm').checked;
+  const dat=document.getElementById('cbDate').checked;
+  let n=(w.en&&w.en.trim())?w.en:(w.name||'');
+  if(norm) n=n.toLowerCase().replace(/\b[a-z]+/g,x=>{
+    const ab=new Set(['NE','NW','SE','SW','GPS','VHF','WPT','SOS','AUX']);
+    return ab.has(x.toUpperCase())?x.toUpperCase():x[0].toUpperCase()+x.slice(1);
+  });
+  if(dat){const now=new Date(),p=x=>String(x).padStart(2,'0');n+=` - Valid ${p(now.getDate())}/${p(now.getMonth()+1)}/${now.getFullYear()}`;}
+  return n;
+}
+
+// ─── INLINE EXPORT-NAME EDIT ─────────────────────────
+function attachENtoTD(td,sp){
+  // Make the entire td cell clickable, not just the span text
+  td.style.cursor='text';
+  td.addEventListener('click',e=>{
+    if(e.target===sp||e.target.classList.contains('einput'))return;
+    e.stopPropagation();
+    sp.click();
+  });
+}
+
+function makeEN(w){
+  const sp=document.createElement('span');
+  sp.className='ename'; sp.title='Click to edit export name';
+  const dname=(w.en&&w.en.trim())?w.en:w.name||'';
+  sp.textContent=dname;
+  if(w.en&&w.en!==w.name)sp.style.color='var(--accent)';
+  sp.addEventListener('click',e=>{
+    e.stopPropagation();
+    const inp=document.createElement('input');
+    inp.className='einput'; inp.value=dname;
+    sp.replaceWith(inp); inp.focus(); inp.select();
+    function save(){
+      const v=inp.value.trim()||w.name;
+      const changed = v !== (w.en||w.name);
+      w.en=v;
+      const ns=makeEN(w);inp.replaceWith(ns);
+      buildClean();
+      // If name was changed and this mark is in a same-name group,
+      // auto-tick its Keep checkbox so they don't have to do it manually
+      if(changed){
+        SN.forEach((g,gi)=>{
+          const isMember=g.members.some(m=>m.id===w.id);
+          if(!isMember)return;
+          const cb=document.querySelector('.snc'+gi+'[value="'+w.id+'"]');
+          if(cb&&!cb.checked){
+            cb.checked=true;
+            snToggle(w.id,gi,true);
+            toast('✏️ Renamed & marked to keep','g');
+            return;
+          }
+        });
+      }
+      if(!changed||!SN.some(g=>g.members.some(m=>m.id===w.id))){
+        toast('✏️ Export name updated','g');
+      }
+    }
+    function cancel(){const ns=makeEN(w);inp.replaceWith(ns);}
+    inp.addEventListener('blur',save);
+    inp.addEventListener('keydown',e2=>{
+      if(e2.key==='Enter'){e2.preventDefault();inp.removeEventListener('blur',save);save();}
+      if(e2.key==='Escape'){e2.preventDefault();inp.removeEventListener('blur',save);cancel();}
+      e2.stopPropagation();
+    });
+    inp.addEventListener('click',e2=>e2.stopPropagation());
+  });
+  return sp;
+}
+
+// ─── PARSING ─────────────────────────────────────────
+function parseDV(s){
+  s=s.trim();
+  const n=parseFloat(s);
+  if(!isNaN(n)&&!/[NSEW°'"]/i.test(s))return n;
+  const h=(s.match(/[NSEW]$/i)||[])[0]?.toUpperCase();
+  const neg=/[SW]/i.test(h||''),sign=s.startsWith('-')?-1:1;
+  const d3=s.match(/(\d+)[°\s]+(\d+)['''\s]+(\d+\.?\d*)/);
+  if(d3){const v=+d3[1]+ +d3[2]/60+parseFloat(d3[3])/3600;return sign*(neg?-v:v);}
+  const d2=s.match(/(\d+)[°\s]+(\d+\.?\d*)/);
+  if(d2){const v=+d2[1]+parseFloat(d2[2])/60;return sign*(neg?-v:v);}
+  const d1=s.match(/(\d+\.?\d*)/);
+  if(d1){const v=parseFloat(d1[1]);return sign*(neg?-v:v);}
+  return NaN;
+}
+
+function detectFmt(txt,ext){
+  if(ext==='gpx')return'gpx';if(ext==='kml')return'kml';
+  if(/[°][^°]*'[^']*"/.test(txt))return'dms';
+  if(/[°]/.test(txt))return'ddm';
+  return'dd';
+}
+
+function parseGPX(txt,fn){
+  const doc=new DOMParser().parseFromString(txt,'application/xml');
+  return[...doc.querySelectorAll('wpt,trkpt,rtept')].map((n,i)=>{
+    const lat=parseFloat(n.getAttribute('lat')),lon=parseFloat(n.getAttribute('lon'));
+    if(isNaN(lat)||isNaN(lon))return null;
+    const nm=n.querySelector('name')?.textContent?.trim()||'WPT-'+String(i+1).padStart(4,'0');
+    const ts=n.querySelector('time')?.textContent?.trim();
+    return{lat,lon,name:nm,dt:ts?new Date(ts):null,sf:'gpx',ff:fn};
+  }).filter(Boolean);
+}
+
+function parseKML(txt,fn){
+  const doc=new DOMParser().parseFromString(txt,'application/xml');
+  return[...doc.querySelectorAll('Placemark')].map((pm,i)=>{
+    const nm=pm.querySelector('name')?.textContent?.trim()||'WPT-'+String(i+1).padStart(4,'0');
+    const el=pm.querySelector('Point coordinates')||pm.querySelector('coordinates');
+    if(!el)return null;
+    const pts=el.textContent.trim().split(',');
+    const lon=parseFloat(pts[0]),lat=parseFloat(pts[1]);
+    if(isNaN(lat)||isNaN(lon))return null;
+    const ts=pm.querySelector('when')?.textContent?.trim();
+    return{lat,lon,name:nm,dt:ts?new Date(ts):null,sf:'kml',ff:fn};
+  }).filter(Boolean);
+}
+
+function parseTXT(txt,fn,fmt){
+  return txt.split(/\r?\n/).map(l=>l.trim())
+    .filter(l=>l&&!l.startsWith('#')&&!/^name[,\t]/i.test(l))
+    .map((line,i)=>{
+      const cols=line.split(/,|\t/).map(c=>c.trim());
+      if(cols.length<2)return null;
+      const lat=parseDV(cols[0]),lon=parseDV(cols[1]);
+      if(isNaN(lat)||isNaN(lon))return null;
+      const nm=cols[2]||'WPT-'+String(i+1).padStart(4,'0');
+      let dt=null;if(cols[3]){const d=new Date(cols[3]);if(!isNaN(d.getTime()))dt=d;}
+      return{lat,lon,name:nm,dt,sf:fmt,ff:fn};
+    }).filter(Boolean);
+}
+
+function parseFile(fn,txt){
+  const ext=fn.split('.').pop().toLowerCase();
+  if(ext==='gpx')return parseGPX(txt,fn);
+  if(ext==='kml')return parseKML(txt,fn);
+  return parseTXT(txt,fn,detectFmt(txt,ext));
+}
+
+function finalize(raw){
+  return raw.map((w,i)=>({
+    id:String(Date.now()+i)+String(Math.random()).slice(2,7),
+    name:w.name,en:w.name,lat:w.lat,lon:w.lon,
+    dt:w.dt,sf:w.sf||'dd',ff:w.ff||'',
+    status:'ok',note:'',keepInGroup:false,snFlag:false
+  }));
+}
+
+// ─── DISTANCE ────────────────────────────────────────
+function hav(a,b,c,d){
+  const R=6371000,f1=a*Math.PI/180,f2=c*Math.PI/180,df=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180;
+  const x=Math.sin(df/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function fdist(m){return m<1000?m.toFixed(0)+'m':(m/1000).toFixed(2)+'km';}
+
+// ─── ANALYSIS ────────────────────────────────────────
+function analyse(){
+  const thr=parseFloat(document.getElementById('thresh').value);
+  WP.forEach(w=>{w.status='ok';w.note='';w.keepInGroup=false;w.snFlag=false;});
+  EG=[];NG=[];SN=[];
+
+  // Exact dupes
+  const seen=new Map();
+  WP.forEach(w=>{const k=w.lat.toFixed(7)+'|'+w.lon.toFixed(7);if(!seen.has(k))seen.set(k,[]);seen.get(k).push(w);});
+  seen.forEach(g=>{
+    if(g.length<2)return;
+    const s=[...g].sort((a,b)=>(a.name||'').toLowerCase().localeCompare((b.name||'').toLowerCase()));
+    s.forEach((w,i)=>{w.status=i===0?'keep':'exact_dupe';w.keepInGroup=i===0;w.note='Exact duplicate';});
+    EG.push({members:s});
+  });
+
+  // Near dupes
+  const elig=WP.filter(w=>w.status==='ok');
+  const vis=new Set();
+  elig.forEach(w=>{
+    if(vis.has(w.id))return;
+    const cl=[w];vis.add(w.id);
+    elig.forEach(o=>{if(vis.has(o.id))return;if(hav(w.lat,w.lon,o.lat,o.lon)<=thr){cl.push(o);vis.add(o.id);}});
+    if(cl.length<2)return;
+    const s=[...cl].sort((a,b)=>(a.name||'').toLowerCase().localeCompare((b.name||'').toLowerCase()));
+    s.forEach((w2,i)=>{w2.status=i===0?'ok':'near_dupe';w2.keepInGroup=i===0;w2.note=i===0?'':`Near-duplicate (≤${thr}m)`;});
+    NG.push({members:s});
+  });
+
+  // Same name, different location
+  const nm=new Map();
+  WP.forEach(w=>{const k=(w.name||'').trim().toLowerCase();if(!nm.has(k))nm.set(k,[]);nm.get(k).push(w);});
+  nm.forEach((g,k)=>{
+    if(g.length<2)return;
+    let maxD=0;
+    for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){const d=hav(g[i].lat,g[i].lon,g[j].lat,g[j].lon);if(d>maxD)maxD=d;}
+    if(maxD<=thr)return;
+    const s=[...g].sort((a,b)=>{if(a.dt&&b.dt)return b.dt-a.dt;if(a.dt)return-1;if(b.dt)return 1;return 0;});
+    s.forEach(w=>w.snFlag=true);
+    SN.push({name:g[0].name,members:s,maxD});
+  });
+
+  // Stats
+  const ex=WP.filter(w=>w.status==='exact_dupe').length;
+  const nr=WP.filter(w=>w.status==='near_dupe').length;
+  const tot=WP.length, uniq=WP.filter(w=>w.status==='ok'||w.status==='keep').length;
+  document.getElementById('sTotal').textContent=tot;
+  document.getElementById('sExact').textContent=ex;
+  document.getElementById('sNear').textContent=nr;
+  document.getElementById('sSame').textContent=SN.length;
+  document.getElementById('sUniq').textContent=uniq;
+  const pct=tot?Math.round((ex+nr)/tot*100):0;
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('plabel').textContent=pct+'% flagged for review';
+  document.getElementById('statsBox').style.display='block';
+  document.getElementById('exportSec').style.display='block';
+  document.getElementById('settingsSec').style.display='block';
+  document.getElementById('thDisp').textContent=thr+'m';
+  document.getElementById('snDisp').textContent=thr+'m';
+
+  badges(); renderAll(); renderExact(); renderNear(); renderSameName(); buildClean();
+  analysed=true;
+  const found=ex+nr;
+  let msg=found>0?`Found ${ex} exact + ${nr} near-duplicates`:'✓ No coordinate duplicates';
+  if(SN.length)msg+=` · ${SN.length} same-name conflict${SN.length>1?'s':''}`;
+  toast(msg,found>0||SN.length?'o':'g');
+  if(EG.length)setTab('exact');
+  else if(NG.length)setTab('near');
+  else if(SN.length)setTab('samename');
+  else setTab('clean');
+}
+
+// ─── BADGES ──────────────────────────────────────────
+function badges(){
+  const b=(id,n)=>{const el=document.getElementById(id);el.textContent=n;el.style.display=n>0?'inline-block':'none';};
+  b('bAll',WP.length);b('bExact',EG.length);b('bNear',NG.length);b('bSame',SN.length);
+}
+
+// ─── COORD TABLE HEADER ROW ───────────────────────────
+function coordTH(sl,al){
+  return `<th class="csrc">Latitude<br><span class="spill">Source · ${sl}</span></th>
+          <th class="csrc">Longitude<br><span class="spill">Source · ${sl}</span></th>
+          <th class="calt">Latitude<br><small>(${al})</small></th>
+          <th class="calt">Longitude<br><small>(${al})</small></th>`;
+}
+
+// ─── RENDER ALL MARKS ────────────────────────────────
+function renderAll(){
+  const tb=document.getElementById('allBody');
+  tb.innerHTML='';
+  document.getElementById('emAll').style.display=WP.length?'none':'block';
+  document.getElementById('allContent').style.display=WP.length?'block':'none';
+  const bdg={ok:'<span class="badge bok">Unique</span>',exact_dupe:'<span class="badge bex">Exact Dupe</span>',near_dupe:'<span class="badge bnd">Near Dupe</span>',keep:'<span class="badge bkp">Keep</span>'};
+  WP.forEach((w,i)=>{
+    const tr=document.createElement('tr');
+    tr.dataset.id=w.id;
+    let rc='rn';
+    if(w.status==='exact_dupe'||w.status==='near_dupe')rc='rd';
+    else if(w.status==='keep')rc='rk';
+    tr.className=rc+(selIds.has(w.id)?' rs':'');
+    const {ls,lns,la,lna}=coordCells(w);
+    tr.innerHTML=`
+      <td><input type="checkbox" class="rc" data-id="${w.id}" ${selIds.has(w.id)?'checked':''}></td>
+      <td style="color:var(--muted);font-size:.69rem">${i+1}</td>
+      <td style="font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(w.name)}">${esc(w.name)}</td>
+      <td class="en-td-${w.id}" style="cursor:text;min-width:90px;"></td>
+      <td class="mono csrc">${ls}</td>
+      <td class="mono csrc">${lns}</td>
+      <td class="mono calt">${la}</td>
+      <td class="mono calt">${lna}</td>
+      <td>${bdg[w.status]||''}</td>`;
+    const _en0=makeEN(w);const _td0=tr.querySelector('.en-td-'+w.id);_td0.appendChild(_en0);attachENtoTD(_td0,_en0);
+    tr.addEventListener('click',e=>{
+      if(e.target.type==='checkbox'||e.target.tagName==='INPUT'||e.target.classList.contains('ename')||e.target.classList.contains('einput'))return;
+      const multi=e.shiftKey||e.ctrlKey||e.metaKey;
+      if(multi){if(selIds.has(w.id))selIds.delete(w.id);else selIds.add(w.id);}
+      else{if(selIds.size===1&&selIds.has(w.id))selIds.clear();else{selIds.clear();selIds.add(w.id);}}
+      renderAll();
+      showMap(WP.filter(x=>selIds.has(x.id)));
+    });
+    tr.querySelector('.rc').addEventListener('change',()=>{
+      if(tr.querySelector('.rc').checked)selIds.add(w.id);else selIds.delete(w.id);
+      renderAll(); showMap(WP.filter(x=>selIds.has(x.id)));
+    });
+    tb.appendChild(tr);
+  });
+  updateColHeaders();
+}
+
+// ─── GROUP CARD HELPER ───────────────────────────────
+function coordTDs(w){
+  const {ls,lns,la,lna}=coordCells(w);
+  return `<td class="mono csrc" style="font-size:.68rem">${ls}</td><td class="mono csrc" style="font-size:.68rem">${lns}</td><td class="mono calt" style="font-size:.68rem">${la}</td><td class="mono calt" style="font-size:.68rem">${lna}</td>`;
+}
+
+// ─── RENDER EXACT GROUPS ─────────────────────────────
+function renderExact(){
+  const list=document.getElementById('exactList');
+  list.innerHTML='';
+  document.getElementById('emExact').style.display=EG.length?'none':'block';
+  document.getElementById('exactContent').style.display=EG.length?'block':'none';
+  const {sl,al}=getCoordLabels();
+  EG.forEach((g,gi)=>{
+    const card=document.createElement('div');card.className='gcard';
+    const rm=g.members.filter(w=>!w.keepInGroup).length;
+    const rows=g.members.map(w=>{
+      return `<tr class="${w.keepInGroup?'rkon':'rkoff'}" style="cursor:pointer" onclick="showMap([window._WP('${w.id}')])">
+        <td onclick="event.stopPropagation()"><label class="klabel"><input type="radio" name="eg${gi}" value="${w.id}" ${w.keepInGroup?'checked':''} onchange="setExact('${w.id}',${gi})"></label></td>
+        <td class="etd-${w.id}" style="min-width:90px;cursor:text;font-weight:${w.keepInGroup?700:400}"></td>
+        ${coordTDs(w)}
+      </tr>`;
+    }).join('');
+    card.innerHTML=`
+      <div class="ghdr" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="gnum" style="background:var(--red)">${gi+1}</div>
+        <span class="gtitle">Exact Duplicate Group</span>
+        <span class="gmeta">${g.members.length} marks — <span style="color:var(--red)">${rm} to remove</span></span>
+        <svg class="caret" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="gbody">
+        <div class="ghint">Identical coordinates. Select which one to keep.</div>
+        <div class="twrap"><table>
+          <thead><tr><th>Keep</th><th>Export Name</th>${coordTH(sl,al)}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+      </div>`;
+    list.appendChild(card);
+    g.members.forEach(w=>{const td=card.querySelector('.etd-'+w.id);if(td){const sp=makeEN(w);td.appendChild(sp);attachENtoTD(td,sp);}});
+  });
+}
+
+// ─── RENDER NEAR GROUPS ──────────────────────────────
+function renderNear(){
+  const list=document.getElementById('nearList');
+  list.innerHTML='';
+  document.getElementById('emNear').style.display=NG.length?'none':'block';
+  document.getElementById('nearContent').style.display=NG.length?'block':'none';
+  const {sl,al}=getCoordLabels();
+  NG.forEach((g,gi)=>{
+    const lats=g.members.map(m=>m.lat),lons=g.members.map(m=>m.lon);
+    const cLat=(Math.min(...lats)+Math.max(...lats))/2,cLon=(Math.min(...lons)+Math.max(...lons))/2;
+    const kc=g.members.filter(w=>w.keepInGroup).length,bc=g.members.length-kc;
+    const card=document.createElement('div');card.className='gcard';card.id='ng'+gi;
+    const rows=g.members.map(w=>{
+      const dist=fdist(hav(cLat,cLon,w.lat,w.lon));
+      return `<tr class="${w.keepInGroup?'rkon':'rkoff'}" id="nr${w.id}" style="cursor:pointer" onclick="showMap([window._WP('${w.id}')])">
+        <td onclick="event.stopPropagation()"><label class="klabel"><input type="checkbox" value="${w.id}" ${w.keepInGroup?'checked':''} onchange="setNear('${w.id}',${gi},this.checked)"></label></td>
+        <td class="ntd-${w.id}" id="nn${w.id}" style="min-width:90px;cursor:text;font-weight:${w.keepInGroup?700:400}"></td>
+        ${coordTDs(w)}
+        <td style="color:var(--text2);font-size:.73rem">${dist}</td>
+      </tr>`;
+    }).join('');
+    card.innerHTML=`
+      <div class="ghdr" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="gnum" style="background:var(--orange)">${gi+1}</div>
+        <span class="gtitle">Near-Duplicate Group</span>
+        <span class="gmeta" id="ngm${gi}">${g.members.length} marks — <span style="color:var(--green)">${kc} kept</span> · <span style="color:var(--red)">${bc} to bin</span></span>
+        <svg class="caret" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="gbody">
+        <div class="ghint">All within your distance threshold. <strong>Tick the ones to keep.</strong></div>
+        <div class="twrap"><table>
+          <thead><tr><th>Keep</th><th>Export Name</th>${coordTH(sl,al)}<th>Dist</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+        <div class="gacts">
+          <button class="btn btn-outline btn-sm" onclick="showMap(NG[${gi}].members)">🗺 Show Group</button>
+          <button class="btn btn-outline btn-sm" onclick="allNear(${gi},true)">☑ Keep All</button>
+          <button class="btn btn-outline btn-sm" onclick="allNear(${gi},false)">☐ Keep None</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+    g.members.forEach(w=>{const td=card.querySelector('.ntd-'+w.id);if(td){const sp=makeEN(w);td.appendChild(sp);attachENtoTD(td,sp);}});
+  });
+}
+
+// ─── RENDER SAME NAME ────────────────────────────────
+function renderSameName(){
+  const list=document.getElementById('sameList');
+  list.innerHTML='';
+  document.getElementById('emSame').style.display=SN.length?'none':'block';
+  document.getElementById('sameContent').style.display=SN.length?'block':'none';
+  const {sl,al}=getCoordLabels();
+  SN.forEach((g,gi)=>{
+    const ref=g.members[0];
+    const card=document.createElement('div');card.className='gcard';card.id='sn'+gi;
+    // Default: first member (alpha/date sorted) is pre-checked = keep
+    const rows=g.members.map((w,mi)=>{
+      const dist=mi===0?'—':fdist(hav(ref.lat,ref.lon,w.lat,w.lon));
+      const defaultKeep=mi===0;  // first entry pre-checked
+      return `<tr class="${defaultKeep?'rkon':'rkoff'}" id="snr${w.id}" style="cursor:pointer" onclick="showMap([window._WP('${w.id}')])">
+        <td onclick="event.stopPropagation()"><label class="klabel"><input type="checkbox" class="snc${gi}" value="${w.id}" ${defaultKeep?'checked':''} onchange="snToggle('${w.id}',${gi},this.checked)"></label></td>
+        <td class="std-${w.id}" style="min-width:90px;cursor:text;font-weight:${defaultKeep?700:400}"></td>
+        ${coordTDs(w)}
+        <td style="color:var(--text2);font-size:.73rem">${dist}</td>
+      </tr>`;
+    }).join('');
+    card.innerHTML=`
+      <div class="ghdr" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="gnum" style="background:var(--purple)">${gi+1}</div>
+        <span class="gtitle">"${esc(g.name)}"</span>
+        <span class="gmeta">${g.members.length} marks · max ${fdist(g.maxD)} apart</span>
+        <svg class="caret" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="gbody">
+        <div class="ghint" style="border-left-color:var(--purple)">Same name, different physical locations up to <strong>${fdist(g.maxD)}</strong> apart. <strong>Tick the marks you want to keep</strong> — unticked marks will be purged. Rename via the Export Name column.</div>
+        <div class="twrap"><table>
+          <thead><tr><th>Keep?</th><th>Export Name <small>(click to edit)</small></th>${coordTH(sl,al)}<th>Dist from 1st</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+        <div class="gacts">
+          <button class="btn btn-outline btn-sm" onclick="showMap(SN[${gi}].members)">🗺 Show Group</button>
+          <button class="btn btn-outline btn-sm" onclick="snAll(${gi},true)">☑ Keep All</button>
+          <button class="btn btn-outline btn-sm" onclick="snAll(${gi},false)">☐ Keep None</button>
+          <button class="btn btn-red btn-sm" id="snpb${gi}" onclick="snPurge(${gi})">✓ Keep Selected</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+    g.members.forEach(w=>{const td=card.querySelector('.std-'+w.id);if(td){const sp=makeEN(w);td.appendChild(sp);attachENtoTD(td,sp);}});
+  });
+}
+
+// ─── SAME NAME HELPERS ───────────────────────────────
+window._WP=id=>WP.find(w=>w.id===id);
+// snToggle: live row highlight + font weight update
+function snToggle(id,gi,checked){
+  const row=document.getElementById('snr'+id);
+  if(row) row.className=checked?'rkon':'rkoff';
+  // update name cell weight
+  const card=document.getElementById('sn'+gi);
+  if(card){const td=card.querySelector('.std-'+id);if(td)td.style.fontWeight=checked?700:400;}
+}
+// snAll: check/uncheck all in group and update rows
+function snAll(gi,v){
+  document.querySelectorAll('.snc'+gi).forEach(cb=>{
+    cb.checked=v;
+    snToggle(cb.value,gi,v);
+  });
+}
+// snPurge: purge the UNCHECKED marks (checked = keep)
+function snPurge(gi){
+  const allCbs=[...document.querySelectorAll('.snc'+gi)];
+  const keepIds=allCbs.filter(cb=>cb.checked).map(cb=>cb.value);
+  const purgeIds=allCbs.filter(cb=>!cb.checked).map(cb=>cb.value);
+  if(!purgeIds.length){toast('All marks in this group are ticked to keep — nothing to purge','o');return;}
+  if(!keepIds.length){
+    toast('At least one mark must be kept — tick the one(s) you want to keep first','o');return;
+  }
+  const toPurge=WP.filter(w=>purgeIds.includes(w.id));
+  confirm2(`Purge ${toPurge.length} mark${toPurge.length>1?'s':''}?`,
+    `Keep ${keepIds.length} and remove ${toPurge.length} mark${toPurge.length>1?'s':''} from group "${SN[gi].name}"? A BinnedMarks backup will be saved first.`,
+    ()=>{exportBinned(toPurge);WP=WP.filter(w=>!purgeIds.includes(w.id));analyse();toast('✓ Purged unchecked marks','g');});
+}
+
+// ─── NEAR HELPERS ────────────────────────────────────
+function setNear(id,gi,checked){
+  const g=NG[gi],w=g.members.find(m=>m.id===id);if(!w)return;
+  w.keepInGroup=checked;w.status=checked?'ok':'near_dupe';w.note=checked?'':w.note||'Near-duplicate';
+  const row=document.getElementById('nr'+id);if(row)row.className=checked?'rkon':'rkoff';
+  const nm=document.getElementById('nn'+id);if(nm)nm.style.fontWeight=checked?700:400;
+  const kc=g.members.filter(m=>m.keepInGroup).length,bc=g.members.length-kc;
+  const meta=document.getElementById('ngm'+gi);
+  if(meta)meta.innerHTML=`${g.members.length} marks — <span style="color:var(--green)">${kc} kept</span> · <span style="color:var(--red)">${bc} to bin</span>`;
+  buildClean();renderAll();
+}
+function allNear(gi,v){NG[gi].members.forEach(w=>{w.keepInGroup=v;w.status=v?'ok':'near_dupe';w.note=v?'':w.note||'Near-duplicate';});buildClean();renderAll();renderNear();}
+function setExact(id,gi){EG[gi].members.forEach(w=>{w.keepInGroup=w.id===id;w.status=w.keepInGroup?'keep':'exact_dupe';});buildClean();renderAll();renderExact();}
+
+// ─── CLEAN PREVIEW ───────────────────────────────────
+function buildClean(){
+  CS=WP.filter(w=>w.status==='ok'||w.status==='keep');
+  BS=WP.filter(w=>w.status==='exact_dupe'||w.status==='near_dupe');
+
+  // Clean preview
+  document.getElementById('emClean').style.display=CS.length?'none':'block';
+  document.getElementById('cleanContent').style.display=CS.length?'block':'none';
+  const tb=document.getElementById('cleanBody');tb.innerHTML='';
+  CS.forEach((w,i)=>{
+    const {ls,lns,la,lna}=coordCells(w);
+    const tr=document.createElement('tr');tr.className='rn';
+    tr.innerHTML=`<td style="color:var(--muted);font-size:.69rem">${i+1}</td>
+      <td style="font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(label(w))}</td>
+      <td class="mono csrc" style="font-size:.68rem">${ls}</td>
+      <td class="mono csrc" style="font-size:.68rem">${lns}</td>
+      <td class="mono calt" style="font-size:.68rem">${la}</td>
+      <td class="mono calt" style="font-size:.68rem">${lna}</td>`;
+    tr.addEventListener('click',()=>showMap([w]));
+    tb.appendChild(tr);
+  });
+
+  // Binned preview
+  document.getElementById('emBinned').style.display=BS.length?'none':'block';
+  document.getElementById('binnedContent').style.display=BS.length?'block':'none';
+  document.getElementById('binnedCount').textContent=BS.length?`${BS.length} mark${BS.length>1?'s':''} will be removed on export`:'';
+  const tb2=document.getElementById('binnedBody');tb2.innerHTML='';
+  BS.forEach((w,i)=>{
+    const {ls,lns,la,lna}=coordCells(w);
+    const reason=w.status==='exact_dupe'?'Exact duplicate':w.status==='near_dupe'?'Near duplicate':w.note||'Flagged';
+    const tr=document.createElement('tr');tr.className='rd';
+    tr.innerHTML=`<td style="color:var(--muted);font-size:.69rem">${i+1}</td>
+      <td style="font-weight:600;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(w.name)}">${esc(w.name)}</td>
+      <td><span class="badge ${w.status==='exact_dupe'?'bex':'bnd'}">${esc(reason)}</span></td>
+      <td class="mono csrc" style="font-size:.68rem">${ls}</td>
+      <td class="mono csrc" style="font-size:.68rem">${lns}</td>
+      <td class="mono calt" style="font-size:.68rem">${la}</td>
+      <td class="mono calt" style="font-size:.68rem">${lna}</td>`;
+    tr.addEventListener('click',()=>showMap([w]));
+    tb2.appendChild(tr);
+  });
+
+  // Sidebar binned count
+  const bEl=document.getElementById('sBinned');
+  if(bEl) bEl.textContent=BS.length;
+
+  // Binned tab badge
+  const bb=document.getElementById('bBinned');
+  if(bb){bb.textContent=BS.length;bb.style.display=BS.length>0?'inline-block':'none';}
+}
+
+// ─── FILE LOAD ────────────────────────────────────────
+const dz=document.getElementById('dz'),fi=document.getElementById('fi');
+dz.addEventListener('click',()=>fi.click());
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+fi.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);fi.value='';});
+
+function loadFile(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    const raw=parseFile(file.name,e.target.result);
+    if(!raw.length){toast('No marks found in that file','r');return;}
+    WP=finalize(raw);selIds.clear();
+    document.getElementById('uploadSec').style.display='none';
+    document.getElementById('loadedSec').style.display='block';
+    const fmt=(raw[0]?.sf||'dd').toUpperCase();
+    document.getElementById('fileChip').innerHTML=`<div class="fn">${esc(file.name)}</div><div class="fc">${raw.length} marks · ${fmt} format</div>`;
+    renderAll();badges();
+    toast(`✓ Loaded ${raw.length} marks — analysing…`,'g');
+    setTimeout(()=>analyse(),80);
+  };
+  r.readAsText(file);
+}
+
+// ─── SLIDER ──────────────────────────────────────────
+let reT=null;
+document.getElementById('thresh').addEventListener('input',function(){
+  document.getElementById('threshVal').textContent=this.value;
+  if(WP.length&&analysed){clearTimeout(reT);reT=setTimeout(()=>analyse(),400);}
+});
+
+// ─── START OVER ──────────────────────────────────────
+document.getElementById('startOverBtn').addEventListener('click',()=>{
+  confirm2('Start Over?','All loaded marks and changes will be lost. This cannot be undone.',()=>{
+    WP=[];EG=[];NG=[];SN=[];CS=[];BS=[];analysed=false;selIds.clear();
+    document.getElementById('uploadSec').style.display='block';
+    document.getElementById('loadedSec').style.display='none';
+    document.getElementById('settingsSec').style.display='none';
+    document.getElementById('statsBox').style.display='none';
+    document.getElementById('exportSec').style.display='none';
+    ['emAll','emExact','emNear','emSame','emClean','emBinned'].forEach(id=>document.getElementById(id).style.display='block');
+    ['allContent','exactContent','nearContent','sameContent','cleanContent','binnedContent'].forEach(id=>document.getElementById(id).style.display='none');
+    badges();showMap([]);setTab('all');fi.value='';
+    toast('Cleared — load a new file','g');
+  });
+});
+
+// ─── BULK ACTIONS ────────────────────────────────────
+document.getElementById('mCheck').addEventListener('change',e=>{
+  if(e.target.checked)WP.forEach(w=>selIds.add(w.id));else selIds.clear();
+  renderAll();showMap(WP.filter(w=>selIds.has(w.id)));
+});
+document.getElementById('selAll').addEventListener('click',()=>{WP.forEach(w=>selIds.add(w.id));renderAll();showMap(WP);});
+document.getElementById('selNone').addEventListener('click',()=>{selIds.clear();renderAll();showMap([]);});
+document.getElementById('selFlag').addEventListener('click',()=>{
+  selIds.clear();WP.filter(w=>w.status==='exact_dupe'||w.status==='near_dupe').forEach(w=>selIds.add(w.id));
+  renderAll();showMap(WP.filter(w=>selIds.has(w.id)));
+});
+document.getElementById('delSel').addEventListener('click',()=>{
+  const bin=WP.filter(w=>selIds.has(w.id));
+  if(!bin.length){toast('No marks selected','o');return;}
+  confirm2(`Delete ${bin.length} mark${bin.length>1?'s':''}?`,`Remove ${bin.length} selected mark${bin.length>1?'s':''}? A BinnedMarks backup will be saved.`,()=>{
+    exportBinned(bin);WP=WP.filter(w=>!selIds.has(w.id));selIds.clear();
+    EG=[];NG=[];SN=[];analysed=false;
+    if(WP.length)analyse();else{renderAll();badges();buildClean();document.getElementById('statsBox').style.display='none';document.getElementById('exportSec').style.display='none';}
+    showMap([]);
+  });
+});
+
+document.getElementById('purgeExact').addEventListener('click',()=>{
+  const bin=WP.filter(w=>w.status==='exact_dupe');
+  if(!bin.length){toast('Nothing to purge','o');return;}
+  confirm2(`Purge ${bin.length} exact duplicate${bin.length>1?'s':''}?`,`Remove ${bin.length} non-kept exact duplicate${bin.length>1?'s':''}? A BinnedMarks backup will be saved.`,()=>{
+    exportBinned(bin);WP=WP.filter(w=>w.status!=='exact_dupe');analyse();toast('✓ Exact duplicates purged','g');
+  });
+});
+
+document.getElementById('purgeNear').addEventListener('click',()=>{
+  const bin=WP.filter(w=>w.status==='near_dupe');
+  if(!bin.length){toast('Nothing to purge','o');return;}
+  confirm2(`Purge ${bin.length} near-duplicate${bin.length>1?'s':''}?`,`Remove ${bin.length} unchecked near-duplicate${bin.length>1?'s':''}? A BinnedMarks backup will be saved.`,()=>{
+    exportBinned(bin);WP=WP.filter(w=>w.status!=='near_dupe');analyse();toast('✓ Near-duplicates purged','g');
+  });
+});
+
+// ─── GPX BUILDER ─────────────────────────────────────
+function buildGPX(pts,creator,fmt){
+  function eLat(w){return exportCoord(w,true,fmt);}
+  function eLon(w){return exportCoord(w,false,fmt);}
+  const wpts=pts.map(w=>`  <wpt lat="${w.lat.toFixed(8)}" lon="${w.lon.toFixed(8)}">\n    <name>${eX(label(w))}</name>${w.dt?'\n    <time>'+w.dt.toISOString()+'</time>':''}\n    <cmt>${eX(eLat(w)+', '+eLon(w))}</cmt>\n  </wpt>`);
+  return`<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="${eX(creator)}" xmlns="http://www.topografix.com/GPX/1/1">\n${wpts.join('\n')}\n</gpx>`;
+}
+
+function exportCoord(w,isLat,fmt){
+  const v=isLat?w.lat:w.lon;
+  const f=fmt==='source'?(w.sf||'dd'):fmt;
+  if(f==='dms')return dms(v,isLat);
+  if(f==='ddm')return ddm(v,isLat);
+  const h=isLat?(v>=0?'N':'S'):(v>=0?'E':'W');
+  return Math.abs(v).toFixed(8)+' '+h;
+}
+
+function exportBinned(pts){
+  if(!pts.length)return;
+  const now=new Date(),p=x=>String(x).padStart(2,'0');
+  const fn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}.gpx`;
+  dl(fn,buildGPX(pts,'Smart Re-Mark BinnedMarks','source'),'application/gpx+xml');
+  toast(`📦 ${pts.length} binned → ${fn}`,'o');
+}
+
+function eX(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function dl(name,content,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:mime}));a.download=name;a.click();}
+function expSet(){return analysed?CS:WP;}
+
+document.getElementById('expGPX').addEventListener('click',()=>{
+  const pts=expSet(),fmt=document.getElementById('expFmt').value;
+  dl('smartremark_clean.gpx',buildGPX(pts,'Smart Re-Mark',fmt),'application/gpx+xml');
+  toast(`✓ Exported ${pts.length} marks as GPX`,'g');
+});
+document.getElementById('expCSV').addEventListener('click',()=>{
+  const pts=expSet(),fmt=document.getElementById('expFmt').value;
+  const hdr='name,lat_src,lon_src,lat_dd,lon_dd,datetime';
+  const rows=pts.map(w=>`"${label(w).replace(/"/g,'""')}","${exportCoord(w,true,fmt)}","${exportCoord(w,false,fmt)}",${w.lat.toFixed(8)},${w.lon.toFixed(8)},${w.dt?w.dt.toISOString():''}`);
+  dl('smartremark_clean.csv',[hdr,...rows].join('\n'),'text/csv');
+  toast(`✓ Exported ${pts.length} marks as CSV`,'g');
+});
+document.getElementById('expKML').addEventListener('click',()=>{
+  const pts=expSet(),fmt=document.getElementById('expFmt').value;
+  const pm=pts.map(w=>`  <Placemark>\n    <name>${eX(label(w))}</name>\n    <description>${eX(exportCoord(w,true,fmt)+', '+exportCoord(w,false,fmt))}</description>\n    <Point><coordinates>${w.lon.toFixed(8)},${w.lat.toFixed(8)},0</coordinates></Point>\n  </Placemark>`);
+  dl('smartremark_clean.kml',`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>\n<name>Smart Re-Mark Export</name>\n${pm.join('\n')}\n</Document></kml>`,'application/vnd.google-earth.kml+xml');
+  toast(`✓ Exported ${pts.length} marks as KML`,'g');
+});
+</script>
+</body>
+</html>
