@@ -36,10 +36,10 @@ header h1 span{color:var(--sand);}
 header p{font-size:0.72rem;color:rgba(200,220,240,0.7);margin-top:2px;}
 
 /* LAYOUT */
-.shell{display:grid;grid-template-columns:270px 1fr 360px;height:calc(100vh - 67px);overflow:hidden;}
+.shell{display:flex;flex-direction:row;height:calc(100vh - 67px);overflow:hidden;}
 
 /* SIDEBAR */
-.sidebar{background:#d0dce8;border-right:1px solid var(--border);padding:16px 14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+.sidebar{background:#d0dce8;border-right:1px solid var(--border);padding:16px 14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;width:270px;flex-shrink:0;}
 .sh{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
 
 /* DROP ZONE */
@@ -99,7 +99,7 @@ input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
 .exp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
 
 /* MAIN CONTENT */
-.content{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.content{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);flex:1;min-width:0;}
 .tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);padding:0 12px;overflow-x:auto;flex-shrink:0;}
 .tab{padding:12px 15px;font-size:0.77rem;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;transition:all .15s;user-select:none;white-space:nowrap;flex-shrink:0;}
 .tab:hover{color:var(--text2);}
@@ -171,7 +171,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .einput-errmsg{font-size:.67rem;color:var(--red);font-weight:700;margin-top:2px;display:block;}
 
 /* MAP PANEL */
-.mapp{background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.mapp{background:var(--white);border-left:none;display:flex;flex-direction:column;overflow:hidden;width:360px;min-width:220px;max-width:700px;flex-shrink:0;}
 .mhdr{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;background:var(--card);flex-shrink:0;}
 .mdot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s;}
 .mdot.on{background:var(--green);}
@@ -287,6 +287,21 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .summary-close-btn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:9px 22px;font-family:'Nunito',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:background .15s;}
 .summary-close-btn:hover{background:var(--header-bg);}
 
+/* RESIZER HANDLE */
+.resizer{width:5px;background:var(--border);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;z-index:5;}
+.resizer:hover,.resizer.dragging{background:var(--accent);}
+.resizer::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:32px;background:rgba(255,255,255,0.5);border-radius:2px;}
+
+/* ALL MARKS SEARCH */
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-wrap svg{position:absolute;left:8px;pointer-events:none;color:var(--muted);}
+.search-input{padding:5px 10px 5px 28px;border:1.5px solid var(--border2);border-radius:6px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:600;color:var(--text);background:var(--white);outline:none;width:180px;transition:border-color .15s,width .2s;}
+.search-input:focus{border-color:var(--accent);width:220px;}
+.search-input::placeholder{color:var(--muted);font-weight:400;}
+.search-clear{position:absolute;right:7px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;line-height:1;padding:0;display:none;}
+.search-clear.visible{display:block;}
+.search-clear:hover{color:var(--text);}
+
 /* VERSION */
 .version-tag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:'Source Code Pro',monospace;}
 
@@ -295,8 +310,8 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 #toast.show{opacity:1;transform:translateY(0);}
 #toast.tg{background:#065f46;}#toast.to{background:#92400e;}#toast.tr{background:#991b1b;}
 
-@media(max-width:1100px){.shell{grid-template-columns:255px 1fr;grid-template-rows:1fr auto;}.mapp{grid-column:1/-1;height:280px;border-top:1px solid var(--border);border-left:none;}}
-@media(max-width:700px){.shell{grid-template-columns:1fr;height:auto;overflow:auto;}.mapp{height:250px;}header{padding:10px 14px;}header h1{font-size:1.15rem;}}
+@media(max-width:1100px){.shell{flex-direction:column;}.sidebar{width:100%;height:auto;max-height:200px;}.mapp{width:100%!important;height:280px;border-top:1px solid var(--border);}.resizer{display:none;}}
+@media(max-width:700px){.shell{flex-direction:column;height:auto;overflow:auto;}.mapp{width:100%!important;height:250px;}header{padding:10px 14px;}header h1{font-size:1.15rem;}}
 
 /* VERSION */
 .vtag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(26,95,138,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:'Source Code Pro',monospace;background:rgba(255,255,255,0.6);padding:2px 7px;border-radius:10px;}
@@ -404,7 +419,12 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
           <button class="btn btn-outline btn-sm" id="selAll">All</button>
           <button class="btn btn-outline btn-sm" id="selNone">None</button>
           <button class="btn btn-outline btn-sm" id="selFlag">Flagged</button>
-          <button class="btn btn-red btn-sm" id="delSel" style="margin-left:auto">🗑 Delete Selected</button>
+          <div class="search-wrap" style="margin-left:auto">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="allSearch" placeholder="Search marks…" autocomplete="off">
+            <button class="search-clear" id="allSearchClear" title="Clear search">✕</button>
+          </div>
+          <button class="btn btn-red btn-sm" id="delSel">🗑 Delete Selected</button>
         </div>
         <div class="twrap"><table>
           <thead><tr>
@@ -497,8 +517,11 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   </div>
 </main>
 
+<!-- RESIZER -->
+<div class="resizer" id="mapResizer" title="Drag to resize map"></div>
+
 <!-- MAP -->
-<div class="mapp">
+<div class="mapp" id="mapPanel">
   <div class="mhdr">
     <div class="mdot" id="mdot"></div>
     <div>
@@ -549,7 +572,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
         </svg>
       </div>
       <div>
-        <h2>Welcome to Smart Re-Mark <span style="font-size:.75rem;font-weight:600;opacity:.7;letter-spacing:.02em;">v1.6</span></h2>
+        <h2>Welcome to Smart Re-Mark <span style="font-size:.75rem;font-weight:600;opacity:.7;letter-spacing:.02em;">v1.7</span></h2>
         <p>GPS Waypoint Deduplicator, Cleaner &amp; Format Converter</p>
       </div>
     </div>
@@ -676,6 +699,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 let WP=[],EG=[],NG=[],SN=[],CS=[],BS=[]; // waypoints, exactGroups, nearGroups, sameNameGroups, cleanSet, binnedSet
 let analysed=false, selIds=new Set();
 let _mapZoom=11, _mapPts=[];
+let allSearchTerm='';
 
 // ─── TOAST ───────────────────────────────────────────
 function toast(m,t){const el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' t'+t:'');clearTimeout(el._t);el._t=setTimeout(()=>el.className='',3400);}
@@ -1223,7 +1247,16 @@ function renderAll(){
   document.getElementById('emAll').style.display=WP.length?'none':'block';
   document.getElementById('allContent').style.display=WP.length?'block':'none';
   const bdg={ok:'<span class="badge bok">Unique</span>',exact_dupe:'<span class="badge bex">Exact Dupe</span>',near_dupe:'<span class="badge bnd">Near Dupe</span>',keep:'<span class="badge bkp">Keep</span>'};
-  WP.forEach((w,i)=>{
+  const term=allSearchTerm.toLowerCase().trim();
+  const visible=term ? WP.filter(w=>(w.name||'').toLowerCase().includes(term)||(w.en||'').toLowerCase().includes(term)) : WP;
+  // Show a "no results" row if search yields nothing
+  if(term && visible.length===0){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="10" style="text-align:center;padding:20px;color:var(--muted);font-size:.8rem;">No marks match "<strong>${esc(term)}</strong>"</td>`;
+    tb.appendChild(tr);
+    updateColHeaders(); return;
+  }
+  visible.forEach((w,i)=>{
     const tr=document.createElement('tr');
     tr.dataset.id=w.id;
     let rc='rn';
@@ -1234,7 +1267,7 @@ function renderAll(){
     tr.innerHTML=`
       <td><input type="checkbox" class="rc" data-id="${w.id}" ${selIds.has(w.id)?'checked':''}></td>
       <td style="color:var(--muted);font-size:.69rem">${i+1}</td>
-      <td style="font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(w.name)}">${esc(w.name)}</td>
+      <td style="font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(w.name)}">${term?esc(w.name).replace(new RegExp('('+term.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+')','gi'),'<mark style="background:#fef3c7;border-radius:2px">$1</mark>'):esc(w.name)}</td>
       <td class="en-td-${w.id}" style="cursor:text;min-width:90px;"></td>
       <td class="mono csrc">${ls}</td>
       <td class="mono csrc">${lns}</td>
@@ -1593,6 +1626,19 @@ function loadFile(file){
   r.readAsText(file);
 }
 
+// ─── ALL MARKS SEARCH ────────────────────────────────
+document.getElementById('allSearch').addEventListener('input',function(){
+  allSearchTerm=this.value;
+  document.getElementById('allSearchClear').classList.toggle('visible', this.value.length>0);
+  renderAll();
+});
+document.getElementById('allSearchClear').addEventListener('click',function(){
+  allSearchTerm='';
+  document.getElementById('allSearch').value='';
+  this.classList.remove('visible');
+  renderAll();
+});
+
 // ─── SLIDER ──────────────────────────────────────────
 let reT=null;
 document.getElementById('thresh').addEventListener('input',function(){
@@ -1611,7 +1657,7 @@ document.getElementById('startOverBtn').addEventListener('click',()=>{
     document.getElementById('exportSec').style.display='none';
     ['emAll','emExact','emNear','emSame','emClean','emBinned'].forEach(id=>document.getElementById(id).style.display='block');
     ['allContent','exactContent','nearContent','sameContent','cleanContent','binnedContent'].forEach(id=>document.getElementById(id).style.display='none');
-    badges();showMap([]);setTab('all');fi.value='';fi2.value='';renderFileChips();
+    allSearchTerm='';const si=document.getElementById('allSearch');if(si)si.value='';badges();showMap([]);setTab('all');fi.value='';fi2.value='';renderFileChips();
     toast('Cleared — load a new file','g');
   });
 });
@@ -1794,6 +1840,65 @@ function doExport(){
   }
 }
 
+// ─── MAP PANEL RESIZER ───────────────────────────────
+(function(){
+  const resizer = document.getElementById('mapResizer');
+  const mapPanel = document.getElementById('mapPanel') || document.querySelector('.mapp');
+  if(!resizer || !mapPanel) return;
+
+  let startX, startW;
+
+  resizer.addEventListener('mousedown', e=>{
+    startX = e.clientX;
+    startW = mapPanel.offsetWidth;
+    resizer.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    function onMove(e){
+      // Dragging left = map gets wider; dragging right = map gets narrower
+      const delta = startX - e.clientX;
+      const newW = Math.min(700, Math.max(220, startW + delta));
+      mapPanel.style.width = newW + 'px';
+    }
+
+    function onUp(){
+      resizer.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      // Trigger Leaflet-style resize if map iframe exists
+      if(window.lmap) setTimeout(()=>lmap.invalidateSize(), 50);
+    }
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+  });
+
+  // Touch support
+  resizer.addEventListener('touchstart', e=>{
+    startX = e.touches[0].clientX;
+    startW = mapPanel.offsetWidth;
+    resizer.classList.add('dragging');
+
+    function onMove(e){
+      const delta = startX - e.touches[0].clientX;
+      const newW = Math.min(700, Math.max(220, startW + delta));
+      mapPanel.style.width = newW + 'px';
+    }
+    function onEnd(){
+      resizer.classList.remove('dragging');
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+    }
+    document.addEventListener('touchmove', onMove, {passive:true});
+    document.addEventListener('touchend', onEnd);
+    e.preventDefault();
+  }, {passive:false});
+})();
+
 // ─── WELCOME MODAL ───────────────────────────────────
 function openWelcome(){document.getElementById('welcomeModal').classList.remove('closed');}
 document.getElementById('helpBtn').addEventListener('click', openWelcome);
@@ -1807,6 +1912,6 @@ document.getElementById('welcomeModal').addEventListener('click',e=>{
 
 document.getElementById('expBtn').addEventListener('click',()=>openExportModal());
 </script>
-<div class="vtag">v1.6</div>
+<div class="vtag">v1.7</div>
 </body>
 </html>
