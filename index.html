@@ -31,7 +31,8 @@
 body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',system-ui,'Helvetica Neue',Arial,sans-serif;font-size:14px;min-height:100vh;}
 
 /* HEADER */
-header{background:var(--header-bg);border-bottom:none;padding:13px 24px;padding-right:110px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(26,95,180,0.35);position:relative;z-index:20;}
+header{background:var(--header-bg);border-bottom:none;padding:13px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(26,95,180,0.35);position:relative;z-index:20;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .logo{width:44px;height:44px;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.22);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 header h1{font-size:1.35rem;font-weight:800;line-height:1;color:#fff;}
 header h1 span{color:#7ec8e3;}
@@ -242,7 +243,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .welcome-close-btn:hover{background:var(--header-bg);}
 
 /* RELEASE NOTES BUTTON */
-.rn-btn{position:absolute;right:58px;top:50%;transform:translateY(-50%);height:28px;padding:0 11px;border-radius:14px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.85);font-size:.65rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;letter-spacing:.04em;transition:background .15s;white-space:nowrap;z-index:30;}
+.rn-btn{height:28px;padding:0 11px;border-radius:14px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.85);font-size:.65rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;letter-spacing:.04em;transition:background .15s;white-space:nowrap;z-index:30;flex-shrink:0;}
 .rn-btn:hover{background:rgba(255,255,255,0.22);}
 .rn-btn svg{opacity:.8;}
 
@@ -268,7 +269,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 .rn-version ul li::before{content:'·';position:absolute;left:0;color:var(--accent);font-weight:700;}
 
 /* HELP BUTTON */
-.help-btn{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;z-index:30;flex-shrink:0;}
+.help-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;z-index:30;flex-shrink:0;}
 .help-btn:hover{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5);}
 .help-btn title{display:none;}
 
@@ -386,7 +387,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 
 @media(max-width:700px){
   /* HEADER */
-  header{padding:10px 14px;padding-right:54px;}
+  header{padding:10px 14px;}
   header h1{font-size:1.05rem;}
   header p{display:none;}
   .help-btn{width:28px;height:28px;font-size:.82rem;right:12px;}
@@ -454,7 +455,7 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
   /* VTAG */
   .vtag{font-size:.55rem;max-width:200px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;}
   /* RELEASE NOTES BTN — icon only on mobile */
-  .rn-btn{right:50px;font-size:.6rem;padding:0 8px;}
+  .rn-btn{font-size:.6rem;padding:0 8px;}
   .rn-btn span.rn-label{display:none;}
   /* RN MODAL */
   .rn-modal-bg{padding:0;align-items:flex-end;}
@@ -463,6 +464,35 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
 
 /* VERSION */
 .vtag{position:fixed;bottom:10px;right:14px;font-size:.62rem;font-weight:700;color:rgba(26,95,138,0.45);letter-spacing:0.08em;z-index:50;pointer-events:none;font-family:ui-monospace,'SF Mono','Cascadia Code','Consolas','Menlo',monospace;background:rgba(255,255,255,0.6);padding:2px 7px;border-radius:10px;}
+
+/* ── MODE TOGGLE ── */
+.mode-toggle{display:flex;background:rgba(0,0,0,0.20);border-radius:8px;padding:3px;gap:2px;z-index:15;margin:0 auto;}
+.mode-btn{padding:5px 13px;border:none;border-radius:6px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .18s;background:transparent;color:rgba(255,255,255,0.55);letter-spacing:.02em;white-space:nowrap;}
+.mode-btn.active{background:#fff;color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.22);}
+.mode-btn:hover:not(.active){color:rgba(255,255,255,0.85);}
+
+/* ── TRACK PANEL (hidden by default) ── */
+#trackPanel{display:none;flex:1;overflow:hidden;}
+#trackPanel.tp-on{display:flex;}
+.tp-sidebar{width:320px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--white);overflow:hidden;}
+.tp-topbar{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--card);display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0;}
+.tp-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px;}
+.tp-foot{padding:8px 10px;border-top:1px solid var(--border);background:var(--card);flex-shrink:0;}
+.tp-map{flex:1;background:#1a2a3a;position:relative;overflow:hidden;}
+.tp-canvas{display:block;width:100%;height:100%;}
+.tp-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,0.35);font-size:.8rem;text-align:center;padding:20px;pointer-events:none;}
+.tr-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .14s;}
+.tr-row:hover,.tr-row.tr-sel{border-color:var(--accent);background:var(--accent-lt);}
+.tr-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.tr-info{flex:1;min-width:0;}
+.tr-name{font-weight:700;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tr-meta{font-size:.66rem;color:var(--muted);margin-top:1px;}
+.tr-cb{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
+.tr-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;padding:2px 4px;line-height:1;flex-shrink:0;border-radius:3px;}
+.tr-del:hover{color:var(--red);background:var(--accent-lt);}
+.tr-legend{display:flex;flex-wrap:wrap;gap:6px;padding:7px 10px;background:var(--card);border-radius:7px;margin-bottom:8px;font-size:.68rem;}
+.tr-legend-item{display:flex;align-items:center;gap:5px;font-weight:600;}
+.tr-legend-sw{width:22px;height:4px;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -489,11 +519,17 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     <h1>Smart <span>Re-Mark</span></h1>
     <p>GPS Waypoint Deduplicator, Cleaner &amp; Format Converter</p>
   </div>
-  <button class="rn-btn" id="rnBtn" title="Release Notes">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    <span class="rn-label">What's New</span>
-  </button>
-  <button class="help-btn" id="helpBtn" title="About Smart Re-Mark">?</button>
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="modeWpt" onclick="setMode('waypoint')">📍 Waypoints</button>
+    <button class="mode-btn" id="modeTrk" onclick="setMode('track')">〰 Tracks</button>
+  </div>
+  <div class="header-right">
+    <button class="rn-btn" id="rnBtn" title="Release Notes">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span class="rn-label">What's New</span>
+    </button>
+    <button class="help-btn" id="helpBtn" title="About Smart Re-Mark">?</button>
+  </div>
 </header>
 
 <div class="shell">
@@ -672,6 +708,43 @@ input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:po
     </div>
   </div>
 </main>
+
+<!-- TRACK PANEL -->
+<div id="trackPanel">
+  <div class="tp-sidebar">
+    <div class="tp-topbar">
+      <span style="font-weight:800;font-size:.85rem;color:var(--accent);flex:1">〰 Tracks</span>
+      <span class="tab-badge" id="trBadge" style="background:var(--accent);display:none">0</span>
+    </div>
+    <div class="tp-topbar" style="border-top:none;">
+      <button class="btn btn-outline btn-sm" onclick="trSelectAll(true)">☑ All</button>
+      <button class="btn btn-outline btn-sm" onclick="trSelectAll(false)">☐ None</button>
+      <div class="search-wrap" style="margin-left:auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="trSearch" placeholder="Search…" oninput="trRender()" style="width:100px;">
+      </div>
+      <button class="btn btn-red btn-sm" onclick="trDeleteSelected()">🗑</button>
+    </div>
+    <div class="tp-list" id="trList">
+      <div class="empty" id="trEmpty">
+        <div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><path d="M3 12h18M3 6l9-3 9 3M3 18l9 3 9-3"/></svg></div>
+        <h3>No tracks loaded</h3>
+        <p>Drop a GPX file to get started</p>
+      </div>
+    </div>
+    <div class="tp-foot">
+      <button class="btn btn-green btn-full" onclick="trExport()">⬇ Export Tracks (GPX)</button>
+    </div>
+  </div>
+  <div class="tp-map" id="trMapArea">
+    <div class="tp-empty" id="trMapEmpty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <p style="font-weight:700;color:rgba(255,255,255,0.55);margin:4px 0 2px">Select a track to preview</p>
+      <p style="font-size:.71rem;margin:0">Select multiple to compare</p>
+    </div>
+    <canvas id="trCanvas" style="position:absolute;inset:0;width:100%;height:100%;display:none;"></canvas>
+  </div>
+</div>
 
 <!-- RESIZER -->
 <div class="resizer" id="mapResizer" title="Drag to resize map"></div>
@@ -1707,7 +1780,7 @@ function renderSameName(){
         <svg class="caret" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="gbody">
-        <div class="ghint" style="border-left-color:var(--purple)">Same name, different physical locations up to <strong>${fdist(g.maxD)}</strong> apart. <strong>Tick the marks you want to keep</strong> — unticked marks will be purged. Rename via the Export Name column.</div>
+        <div class="ghint" style="border-left-color:var(--purple)">Same name, different physical locations up to <strong>${fdist(g.maxD)}</strong> apart. <strong>Tick the marks you want to keep.</strong> Unticked marks will be purged to the BinnedMarks backup when you export. Rename via the Export Name column.</div>
         <div class="twrap"><table>
           <thead><tr><th>Keep?</th><th>Export Name <small>(click to edit)</small></th>${coordTH(sl,al)}<th>Dist from 1st</th></tr></thead>
           <tbody>${rows}</tbody>
@@ -1716,7 +1789,6 @@ function renderSameName(){
           <button class="btn btn-outline btn-sm" onclick="showMap(SN[${gi}].members)">🗺 Show Group</button>
           <button class="btn btn-outline btn-sm" onclick="snAll(${gi},true)">☑ Keep All</button>
           <button class="btn btn-outline btn-sm" onclick="snAll(${gi},false)">☐ Keep None</button>
-          <button class="btn btn-red btn-sm" id="snpb${gi}" onclick="snPurge(${gi})">✓ Keep Selected</button>
         </div>
       </div>`;
     list.appendChild(card);
@@ -1753,20 +1825,7 @@ function snAll(gi,v){
   });
   buildClean();
 }
-// snPurge: purge the UNCHECKED marks (checked = keep)
-function snPurge(gi){
-  const allCbs=[...document.querySelectorAll('.snc'+gi)];
-  const keepIds=allCbs.filter(cb=>cb.checked).map(cb=>cb.value);
-  const purgeIds=allCbs.filter(cb=>!cb.checked).map(cb=>cb.value);
-  if(!purgeIds.length){toast('All marks in this group are ticked to keep — nothing to purge','o');return;}
-  if(!keepIds.length){
-    toast('At least one mark must be kept — tick the one(s) you want to keep first','o');return;
-  }
-  const toPurge=WP.filter(w=>purgeIds.includes(w.id));
-  confirm2(`Purge ${toPurge.length} mark${toPurge.length>1?'s':''}?`,
-    `Keep ${keepIds.length} and remove ${toPurge.length} mark${toPurge.length>1?'s':''} from group "${SN[gi].name}"? A BinnedMarks backup will be saved first.`,
-    ()=>{exportBinned(toPurge);WP=WP.filter(w=>!purgeIds.includes(w.id));analyse();toast('✓ Purged unchecked marks','g');});
-}
+// snPurge removed — unchecked marks are purged automatically at export time
 
 // ─── NEAR HELPERS ────────────────────────────────────
 function setNear(id,gi,checked){
@@ -1895,6 +1954,7 @@ function removeFileMeta(idx){
 }
 
 function loadFile(file){
+  if(appMode==='track'){trLoad(file);return;}
   // Prevent loading same filename twice
   if(loadedFileMeta.some(m=>m.name===file.name)){
     toast(`"${file.name}" is already loaded`,'o');return;
@@ -1973,7 +2033,7 @@ document.getElementById('thresh').addEventListener('input',function(){
 // ─── START OVER ──────────────────────────────────────
 document.getElementById('startOverBtn').addEventListener('click',()=>{
   confirm2('Start Over?','All loaded marks and changes will be lost. This cannot be undone.',()=>{
-    WP=[];EG=[];NG=[];SN=[];CS=[];BS=[];loadedFileMeta=[];analysed=false;selIds.clear();
+    WP=[];EG=[];NG=[];SN=[];CS=[];BS=[];loadedFileMeta=[];analysed=false;selIds.clear();TRACKS=[];
     document.getElementById('uploadSec').style.display='block';
     document.getElementById('loadedSec').style.display='none';
     document.getElementById('settingsSec').style.display='none';
@@ -2092,7 +2152,7 @@ function openExportModal(){
     const now=new Date(),p=x=>String(x).padStart(2,'0');
     const bfn=`BinnedMarks${p(now.getDate())}${p(now.getMonth()+1)}${String(now.getFullYear()).slice(2)}${p(now.getHours())}${p(now.getMinutes())}.gpx`;
     binnedNote.style.display='block';
-    binnedNote.innerHTML=`🗑 <strong>${binned} binned mark${binned>1?'s':''}</strong> will also be automatically saved as <strong>${bfn}</strong>`;
+    binnedNote.innerHTML=`🗑 <strong>${binned} binned mark${binned>1?'s':''}</strong> (including any same-name marks not ticked to keep) will be automatically saved as <strong>${bfn}</strong> — they will not appear in your export.`;
   } else {
     binnedNote.style.display='none';
   }
@@ -2326,6 +2386,178 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register(swUrl,{scope:'./'})
     .catch(()=>{}); // fail silently if SW not supported
 }
+
+/* ═══════════════════ TRACK MODE ═══════════════════ */
+let appMode = 'waypoint';
+let TRACKS = [];
+const TR_COLORS = ['#e63946','#2196f3','#ff9800','#4caf50','#9c27b0','#00bcd4','#ff5722','#8bc34a','#673ab7','#f06292','#26c6da','#ffd54f','#66bb6a','#ef5350','#42a5f5'];
+
+function setMode(m) {
+  appMode = m;
+  document.getElementById('modeWpt').classList.toggle('active', m === 'waypoint');
+  document.getElementById('modeTrk').classList.toggle('active', m === 'track');
+  document.querySelector('.content').style.display = m === 'waypoint' ? '' : 'none';
+  const tp = document.getElementById('trackPanel');
+  tp.classList.toggle('tp-on', m === 'track');
+  if (m === 'track') trRender();
+}
+
+function trParseGPX(txt, fn) {
+  const doc = new DOMParser().parseFromString(txt, 'text/xml');
+  return Array.from(doc.querySelectorAll('trk')).map((trk, i) => {
+    const name = trk.querySelector('name')?.textContent?.trim() || fn || ('Track ' + (TRACKS.length + i + 1));
+    const pts = Array.from(trk.querySelectorAll('trkpt')).map(p => ({
+      lat: parseFloat(p.getAttribute('lat')),
+      lon: parseFloat(p.getAttribute('lon'))
+    })).filter(p => !isNaN(p.lat) && !isNaN(p.lon));
+    let dist = 0;
+    for (let j = 1; j < pts.length; j++) dist += haversine(pts[j-1].lat, pts[j-1].lon, pts[j].lat, pts[j].lon);
+    return { id: Date.now() + Math.random(), name, pts, dist, selected: false, binned: false, color: '#888' };
+  });
+}
+
+function trLoad(file) {
+  const r = new FileReader();
+  r.onload = e => {
+    const tracks = trParseGPX(e.target.result, file.name.replace(/\.gpx$/i, ''));
+    if (!tracks.length) { alert('No tracks found in: ' + file.name); return; }
+    TRACKS.push(...tracks);
+    TRACKS.filter(t => !t.binned).forEach((t, i) => t.color = TR_COLORS[i % TR_COLORS.length]);
+    trRender();
+  };
+  r.readAsText(file);
+}
+
+function trRender() {
+  const q = (document.getElementById('trSearch')?.value || '').toLowerCase();
+  const active = TRACKS.filter(t => !t.binned);
+  const visible = active.filter(t => !q || t.name.toLowerCase().includes(q));
+  const badge = document.getElementById('trBadge');
+  badge.textContent = active.length;
+  badge.style.display = active.length ? '' : 'none';
+  const list = document.getElementById('trList');
+  const empty = document.getElementById('trEmpty');
+  if (!active.length) {
+    list.innerHTML = '';
+    list.appendChild(empty);
+    empty.style.display = 'flex';
+    trDrawMap([]);
+    return;
+  }
+  // legend for selected
+  const sel = active.filter(t => t.selected);
+  let html = sel.length
+    ? `<div class="tr-legend">${sel.map(t => `<span class="tr-legend-item"><span class="tr-legend-sw" style="background:${t.color}"></span><span>${escHtml(t.name)}</span></span>`).join('')}</div>`
+    : '';
+  html += visible.map(t => `
+    <div class="tr-row${t.selected ? ' tr-sel' : ''}" onclick="trToggle('${t.id}',${!t.selected})">
+      <input type="checkbox" class="tr-cb" ${t.selected ? 'checked' : ''} onclick="event.stopPropagation();trToggle('${t.id}',this.checked)">
+      <span class="tr-swatch" style="background:${t.color}"></span>
+      <div class="tr-info">
+        <div class="tr-name" title="${escHtml(t.name)}">${escHtml(t.name)}</div>
+        <div class="tr-meta">${t.pts.length.toLocaleString()} pts &middot; ${(t.dist/1000).toFixed(2)} km</div>
+      </div>
+      <button class="tr-del" title="Remove" onclick="event.stopPropagation();trBin('${t.id}')">✕</button>
+    </div>`).join('');
+  list.innerHTML = html;
+  trDrawMap(TRACKS.filter(t => !t.binned && t.selected));
+}
+
+function trToggle(id, sel) {
+  const t = TRACKS.find(x => x.id == id);
+  if (t) { t.selected = sel; trRender(); }
+}
+
+function trSelectAll(v) {
+  TRACKS.filter(t => !t.binned).forEach(t => t.selected = v);
+  trRender();
+}
+
+function trBin(id) {
+  const t = TRACKS.find(x => x.id == id);
+  if (t) { t.binned = true; t.selected = false; }
+  trRender();
+}
+
+function trDeleteSelected() {
+  const sel = TRACKS.filter(t => t.selected && !t.binned);
+  if (!sel.length) { alert('No tracks selected.'); return; }
+  if (!confirm('Remove ' + sel.length + ' selected track(s)?')) return;
+  sel.forEach(t => { t.binned = true; t.selected = false; });
+  trRender();
+}
+
+function trDrawMap(tracks) {
+  const canvas = document.getElementById('trCanvas');
+  const empty = document.getElementById('trMapEmpty');
+  if (!tracks.length) { canvas.style.display = 'none'; empty.style.display = 'flex'; return; }
+  canvas.style.display = 'block'; empty.style.display = 'none';
+  const area = document.getElementById('trMapArea');
+  canvas.width = area.clientWidth;
+  canvas.height = area.clientHeight;
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#1a2a3a'; ctx.fillRect(0, 0, W, H);
+  // subtle grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) {
+    const y = H * i / 5; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    const x = W * i / 5; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  // bounding box
+  let minLat = Infinity, maxLat = -Infinity, minLon = Infinity, maxLon = -Infinity;
+  tracks.forEach(t => t.pts.forEach(p => {
+    if (p.lat < minLat) minLat = p.lat; if (p.lat > maxLat) maxLat = p.lat;
+    if (p.lon < minLon) minLon = p.lon; if (p.lon > maxLon) maxLon = p.lon;
+  }));
+  const pad = 40;
+  const scX = (W - pad*2) / (maxLon - minLon || 0.001);
+  const scY = (H - pad*2) / (maxLat - minLat || 0.001);
+  const sc = Math.min(scX, scY);
+  const oX = (W - (maxLon - minLon) * sc) / 2;
+  const oY = (H - (maxLat - minLat) * sc) / 2;
+  const tx = lon => oX + (lon - minLon) * sc;
+  const ty = lat => oY + (maxLat - lat) * sc;
+  tracks.forEach(t => {
+    if (!t.pts.length) return;
+    // shadow
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath(); t.pts.forEach((p, i) => i ? ctx.lineTo(tx(p.lon), ty(p.lat)) : ctx.moveTo(tx(p.lon), ty(p.lat))); ctx.stroke();
+    // line
+    ctx.strokeStyle = t.color; ctx.lineWidth = 2.5;
+    ctx.beginPath(); t.pts.forEach((p, i) => i ? ctx.lineTo(tx(p.lon), ty(p.lat)) : ctx.moveTo(tx(p.lon), ty(p.lat))); ctx.stroke();
+    // start dot (green)
+    const s = t.pts[0];
+    ctx.beginPath(); ctx.arc(tx(s.lon), ty(s.lat), 5, 0, Math.PI*2); ctx.fillStyle = '#4ade80'; ctx.fill();
+    // end dot (red)
+    const e = t.pts[t.pts.length - 1];
+    ctx.beginPath(); ctx.arc(tx(e.lon), ty(e.lat), 5, 0, Math.PI*2); ctx.fillStyle = '#f87171'; ctx.fill();
+    // label
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px system-ui,sans-serif'; ctx.globalAlpha = 0.85;
+    ctx.fillText(t.name, tx(s.lon) + 8, ty(s.lat) - 7);
+    ctx.globalAlpha = 1;
+  });
+}
+
+function trExport() {
+  const exp = TRACKS.filter(t => !t.binned);
+  if (!exp.length) { alert('No tracks to export.'); return; }
+  const cs = '/';
+  const lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+    '<gpx version="1.1" creator="Smart Re-Mark" xmlns="http://www.topografix.com/GPX/1/1">'];
+  exp.forEach(t => {
+    lines.push(`  <trk><name>${escHtml(t.name)}<${cs}name><trkseg>`);
+    t.pts.forEach(p => lines.push(`    <trkpt lat="${p.lat}" lon="${p.lon}"><${cs}trkpt>`));
+    lines.push(`  <${cs}trkseg><${cs}trk>`);
+  });
+  lines.push(`<${cs}gpx>`);
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([lines.join('\n')], {type:'application/gpx+xml'})),
+    download: 'Tracks.gpx'
+  });
+  a.click();
+}
+
 </script>
 
 </body>
